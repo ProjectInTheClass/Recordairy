@@ -28,7 +28,7 @@ struct MainView: View {
         navAppearance.backgroundColor = UIColor.white.withAlphaComponent(0.75) // 네비게이션 바 배경색
         navAppearance.titleTextAttributes = [
             .font: UIFont.systemFont(ofSize: 24, weight: .bold),
-            .foregroundColor: UIColor.black
+            .foregroundColor: UIColor(red: 0x2C / 255.0, green: 0x3E / 255.0, blue: 0x50 / 255.0, alpha: 1)
         ]
 
         UINavigationBar.appearance().standardAppearance = navAppearance
@@ -45,6 +45,7 @@ struct MainView: View {
             }
             .tabItem {
                 Image(systemName: "calendar")
+
             }
             .tag(0)
 
