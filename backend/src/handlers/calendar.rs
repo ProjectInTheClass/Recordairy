@@ -5,8 +5,9 @@ use axum::{
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use time::OffsetDateTime;
 
-use crate::db::diary::Diary;
+use crate::db::diary::{get_diaries_of_month, Diary};
 
 #[derive(Deserialize, Debug)]
 pub struct GetCalendarParams {
@@ -17,15 +18,20 @@ pub struct GetCalendarParams {
 
 #[derive(Deserialize, Serialize, Debug)]
 struct CalendarData {
-    created_at: String,
+    #[serde(with = "time::serde::rfc3339")]
+    created_at: OffsetDateTime,
     diary: Diary,
 }
 
-pub struct CalendarDataResponse(Vec<CalendarData>);
+pub struct CalendarDataResponse(anyhow::Result<Vec<CalendarData>>);
 
 impl IntoResponse for CalendarDataResponse {
     fn into_response(self) -> Response {
-        let serialized = serde_json::to_string(&self.0);
+        let Ok(resp) = &self.0 else {
+            let e = &self.0.unwrap_err();
+            return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response();
+        };
+        let serialized = serde_json::to_string(resp);
         if let Ok(serialized) = serialized {
             (StatusCode::OK, serialized).into_response()
         } else {
@@ -38,11 +44,22 @@ impl IntoResponse for CalendarDataResponse {
     }
 }
 
+// fetch all calendar entries for the given user & year & month
+// TODO: join query to fetch deco as well
 pub async fn get_calendar(
     State(pool): State<PgPool>,
     Query(params): Query<GetCalendarParams>,
 ) -> CalendarDataResponse {
-    dbg!(params);
-
-    todo!()
+    let diaries = match get_diaries_of_month(&pool, params.year, params.month, params.user_id).await
+    {
+        Ok(diaries) => diaries,
+        Err(e) => return CalendarDataResponse(Err(e)),
+    };
+    CalendarDataResponse(Ok(diaries
+        .into_iter()
+        .map(|d| CalendarData {
+            created_at: d.created_at,
+            diary: d,
+        })
+        .collect()))
 }
