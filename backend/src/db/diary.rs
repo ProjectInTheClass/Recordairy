@@ -14,6 +14,13 @@ pub struct Diary {
     is_private: bool,
 }
 
+pub struct DiaryParams {
+    user_id: Uuid,
+    audio_link: String,
+    summary: String,
+    is_private: bool,
+}
+
 pub async fn get_diaries_of_month(
     pool: &PgPool,
     year: u32,
@@ -33,4 +40,18 @@ pub async fn get_diaries_of_month(
     .fetch_all(pool)
     .await?;
     Ok(resp)
+}
+
+pub async fn insert_diary(pool: &PgPool, diary: DiaryParams) -> anyhow::Result<()> {
+    sqlx::query(
+        "
+    INSERT INTO diary (user_id, audio_link, summary, is_private) VALUES ($1,$2,$3,$4)",
+    )
+    .bind(diary.user_id)
+    .bind(diary.audio_link)
+    .bind(diary.summary)
+    .bind(diary.is_private)
+    .execute(pool)
+    .await?;
+    Ok(())
 }
