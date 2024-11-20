@@ -1,0 +1,26 @@
+[package]
+name = "recordiary"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0.214", features = ["derive"] }
+axum = "0.7.7"
+hyper = "1.5.0"
+sqlx = { version = "0.8.2", features = [
+    "runtime-tokio-rustls",
+    "any",
+    "postgres",
+    "time",
+    "uuid",
+] }
+tokio = { version = "1.41.0", features = ["full"] }
+serde_json = "1.0.132"
+uuid = { version = "1.11.0", features = ["serde"] }
+time = { version = "0.3.36", features = [
+    "serde",
+    "serde-well-known",
+    "serde-human-readable",
+] }
+reqwest = { version = "0.12.9", features = ["json"] }
+anyhow = "1.0.93"
