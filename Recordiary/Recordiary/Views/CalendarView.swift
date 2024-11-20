@@ -3,16 +3,16 @@ import SwiftUI
 // 감정 및 DiaryEntry 모델 정의
 enum Emotion: String, Codable, CaseIterable {
     case anger = "화남"
-    case sadness = "우울함"
-    case happiness = "행복함"
-    case neutral = "평범함"
+    case sadness = "슬픔"
+    case happiness = "행복"
+    case neutral = "짜증"
 
     var color: Color {
         switch self {
-        case .anger: return .red
-        case .sadness: return .blue
-        case .happiness: return .yellow
-        case .neutral: return .gray
+        case .anger: return Color(hex: "#E57373")
+        case .sadness: return Color(hex: "#A68DBF")
+        case .happiness: return Color(hex: "#F2CD00")
+        case .neutral: return Color(hex: "#81C784")
         }
     }
 }
@@ -25,36 +25,73 @@ struct DiaryEntry: Identifiable, Codable {
     var transcribedText: String
 }
 
+
 struct CalendarView: View {
-    // 상태 관리
-    @State private var entries: [DiaryEntry] = [] // 빈 배열로 초기화
+    @State private var entries: [DiaryEntry] = [
+        DiaryEntry(
+            date: Calendar.current.date(byAdding: .day, value: -3, to: Date())!,
+            emotion: .happiness,
+            audioFileURL: URL(string: "dummy1")!,
+            transcribedText: "오늘은 정말 행복한 날이었다!"
+        ),
+        DiaryEntry(
+            date: Calendar.current.date(byAdding: .day, value: -1, to: Date())!,
+            emotion: .sadness,
+            audioFileURL: URL(string: "dummy2")!,
+            transcribedText: "오늘은 조금 슬펐던 하루였다."
+        ),
+        DiaryEntry(
+            date: Calendar.current.date(byAdding: .day, value: 0, to: Date())!,
+            emotion: .neutral,
+            audioFileURL: URL(string: "dummy3")!,
+            transcribedText: "그냥 평범한 하루였어."
+        ),
+        DiaryEntry(
+            date: Calendar.current.date(byAdding: .day, value: -7, to: Date())!,
+            emotion: .anger,
+            audioFileURL: URL(string: "dummy4")!,
+            transcribedText: "오늘은 정말 화나는 일이 있었다!"
+        )
+    ]
     @State private var selectedDate: Date?
     @State private var currentMonth: Date = Date()
-    @State private var showAudioPlayer: Bool = false
+    @State private var showCustomModal: Bool = false
 
     var body: some View {
         VStack(spacing: 20) {
             calendarHeader
                 .padding(.top)
 
-            calendarGrid
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white)
+                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                .overlay(
+                    VStack(spacing: 16) {
+                        daysOfWeekHeader
+                        calendarGrid
+                            .padding(.horizontal)
+                    }
+                    .padding(.vertical)
+                )
                 .padding(.horizontal)
-                .background(RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white)
-                                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2))
-            
-            emotionStats
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(Color(hex: "#FFF8E1"))
+
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white)
+                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                .overlay(
+                    emotionStats
+                        .padding()
+                )
+                .padding(.horizontal)
 
             Spacer()
         }
         .background(Color(hex: "#FFF8E1").ignoresSafeArea())
-        .sheet(isPresented: $showAudioPlayer) {
+        .sheet(isPresented: $showCustomModal) {
             if let date = selectedDate {
-                audioDiaryPlayerSheet
-                    .presentationDetents([.medium]) // 중간 높이로 시트 표시
+                CustomModal {
+                    modalContent(for: date)
+                }
             }
         }
     }
@@ -80,6 +117,22 @@ struct CalendarView: View {
         .padding(.horizontal)
     }
 
+    // 요일 헤더
+    private var daysOfWeekHeader: some View {
+        let daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"]
+
+        return HStack {
+            ForEach(daysOfWeek, id: \.self) { day in
+                Text(day)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding(.horizontal)
+    }
+
     // 날짜 그리드
     private var calendarGrid: some View {
         let daysInMonth = Calendar.current.range(of: .day, in: .month, for: currentMonth)!
@@ -94,7 +147,7 @@ struct CalendarView: View {
                 let date = Calendar.current.date(byAdding: .day, value: day - 1, to: firstDayOfMonth)!
                 Button(action: {
                     selectedDate = date
-                    showAudioPlayer = true
+                    showCustomModal = true
                 }) {
                     Text("\(day)")
                         .padding(8)
@@ -107,42 +160,45 @@ struct CalendarView: View {
         .padding(.top, 8)
     }
 
-    // 감정 통계 섹션 (히스토그램)
+    // 감정 통계 (3D 원형 그래프 및 감정 정보 포함)
     private var emotionStats: some View {
         let statistics = emotionStatistics(for: currentMonth)
-        let emotions = Emotion.allCases
+        let totalEntries = entries(for: currentMonth).count
 
-        return VStack(alignment: .leading) {
-            Text("나의 감정 통계")
-                .font(.headline)
-                .padding(.bottom, 8)
+        return HStack(alignment: .top) {
+            // 감정별 정보
+            VStack(alignment: .leading, spacing: 8) {
+                Text("이번달 일기 수: \(totalEntries)")
+                    .font(.headline)
+                    .padding(.bottom, 8)
 
-            HStack(alignment: .bottom) {
-                ForEach(emotions, id: \.self) { emotion in
-                    VStack {
-                        Text("\(Int(statistics[emotion] ?? 0))%")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                        RoundedRectangle(cornerRadius: 4)
+                ForEach(Emotion.allCases, id: \.self) { emotion in
+                    let count = Int(statistics[emotion] ?? 0)
+                    let percentage = totalEntries > 0 ? (statistics[emotion] ?? 0) : 0
+                    HStack {
+                        Circle()
                             .fill(emotion.color)
-                            .frame(
-                                width: 20,
-                                height: CGFloat(statistics[emotion] ?? 0) * 2 // 비율에 따라 높이 조절
-                            )
-                        Text(emotion.rawValue)
-                            .font(.caption)
+                            .frame(width: 12, height: 12)
+                        Text("\(emotion.rawValue) 총 \(count)일 (\(String(format: "%.0f", percentage))%)")
+                            .font(.subheadline)
                             .foregroundColor(.gray)
                     }
                 }
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            // 원형 그래프
+            PieChartView(statistics: statistics)
+                .frame(width: 150, height: 150)
         }
+        .padding()
     }
 
-    // 오디오 다이어리 재생 시트
-    private var audioDiaryPlayerSheet: some View {
+
+    // 모달 내용
+    private func modalContent(for date: Date) -> some View {
         VStack {
-            if let date = selectedDate, let entry = entries.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
+            if let entry = entries.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
                 Text("일기 날짜: \(date, formatter: dateFormatter)")
                     .font(.headline)
                 Text("분석된 감정: \(entry.emotion.rawValue)")
@@ -155,33 +211,6 @@ struct CalendarView: View {
                     .foregroundColor(.gray)
             }
         }
-        .padding()
-    }
-
-    // 녹음 데이터 추가
-    func addDiaryEntry(date: Date, audioURL: URL) {
-        let transcribedText = transcribeAudio(from: audioURL) // 음성을 텍스트로 변환
-        let emotion = analyzeEmotion(from: transcribedText) // 감정 분석
-        let entry = DiaryEntry(date: date, emotion: emotion, audioFileURL: audioURL, transcribedText: transcribedText)
-        entries.append(entry)
-    }
-
-    // 음성을 텍스트로 변환 (모의 함수)
-    private func transcribeAudio(from url: URL) -> String {
-        return "모의 텍스트 변환: 오늘은 정말 행복한 날이에요!"
-    }
-
-    // 텍스트에서 감정 분석
-    private func analyzeEmotion(from text: String) -> Emotion {
-        if text.contains("화") || text.contains("분노") {
-            return .anger
-        } else if text.contains("슬픔") || text.contains("우울") {
-            return .sadness
-        } else if text.contains("행복") || text.contains("기쁨") {
-            return .happiness
-        } else {
-            return .neutral
-        }
     }
 
     // 날짜별 색상 반환
@@ -192,7 +221,6 @@ struct CalendarView: View {
         return Color.clear
     }
 
-    // 감정 통계 계산
     private func emotionStatistics(for month: Date) -> [Emotion: Double] {
         let monthEntries = entries(for: month)
         let total = Double(monthEntries.count)
@@ -210,7 +238,6 @@ struct CalendarView: View {
         return counts
     }
 
-    // 특정 월의 일기 필터링
     private func entries(for month: Date) -> [DiaryEntry] {
         let calendar = Calendar.current
         return entries.filter { calendar.isDate($0.date, equalTo: month, toGranularity: .month) }
@@ -226,5 +253,56 @@ struct CalendarView: View {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         return formatter
+    }
+}
+
+// 3D 원형 그래프 뷰
+struct PieChartView: View {
+    let statistics: [Emotion: Double]
+
+    var body: some View {
+        GeometryReader { geometry in
+            let total = statistics.values.reduce(0, +)
+            let angles = statistics.map { emotion, value in
+                (emotion, Angle.degrees(value / total * 360))
+            }
+
+            ZStack {
+                ForEach(angles.indices, id: \.self) { index in
+                    let startAngle = angles.prefix(index).map(\.1).reduce(Angle.degrees(0), +)
+                    let endAngle = startAngle + angles[index].1
+                    PieSlice(startAngle: startAngle, endAngle: endAngle)
+                        .fill(
+                            RadialGradient(
+                                gradient: Gradient(colors: [angles[index].0.color.opacity(0.8), angles[index].0.color]),
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: geometry.size.width / 2
+                            )
+                        )
+                        .shadow(color: .black.opacity(0.1), radius: 4, x: 2, y: 2)
+                }
+            }
+        }
+    }
+}
+
+struct PieSlice: Shape {
+    var startAngle: Angle
+    var endAngle: Angle
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) / 2
+        path.move(to: center)
+        path.addArc(
+            center: center,
+            radius: radius,
+            startAngle: startAngle,
+            endAngle: endAngle,
+            clockwise: false
+        )
+        return path
     }
 }
