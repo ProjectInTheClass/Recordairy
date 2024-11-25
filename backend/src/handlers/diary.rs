@@ -3,28 +3,47 @@ use axum::{
     extract::{Multipart, Query, State},
     response::IntoResponse,
 };
+use hyper::StatusCode;
 use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::{
-    db::diary::insert_diary,
+    db::diary::{insert_diary, Diary},
     storage::client::SupabaseClient,
     utils::{get_diary_filename, parse_multipart::parse_multipart},
     AppState,
 };
 
-struct Diary();
-
-pub async fn get_diaries() -> Vec<Diary> {
-    todo!()
+#[derive(Deserialize, Clone, Debug)]
+pub struct GetDiariesParams {
+    user_id: Uuid,
+    diary_ids: Vec<i64>,
 }
 
-pub struct CreateDiaryResponse(anyhow::Result<()>);
+pub struct GetDiariesRseponse(Vec<Diary>);
 
-impl IntoResponse for CreateDiaryResponse {
+impl IntoResponse for GetDiariesRseponse {
     fn into_response(self) -> axum::response::Response {
-        todo!()
+        let diaries = self.0;
+        let serialized = serde_json::to_string(&diaries);
+
+        match serialized {
+            Ok(serialized) => (StatusCode::OK, serialized).into_response(),
+            Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        }
+    }
+}
+
+#[debug_handler(state = AppState)]
+pub async fn get_diaries(
+    State(pool): State<PgPool>,
+    Query(params): Query<GetDiariesParams>,
+) -> axum::response::Result<GetDiariesRseponse> {
+    let diaries = crate::db::diary::get_diaries(&pool, params.user_id, params.diary_ids).await;
+    match diaries {
+        Ok(diaries) => Ok(GetDiariesRseponse(diaries)),
+        Err(e) => Err(e.to_string().into()),
     }
 }
 
@@ -40,12 +59,12 @@ pub async fn create_diary(
     State(storage_client): State<SupabaseClient>,
     Query(params): Query<CreateDiaryParams>,
     multipart: Multipart,
-) -> axum::response::Result<()> {
+) -> axum::response::Result<String> {
     let mut tx = match pool.begin().await {
         Ok(tx) => tx,
         Err(e) => return Err(e.to_string().into()),
     };
-    let result: anyhow::Result<()> = async {
+    let result: anyhow::Result<_> = async {
         let audio_bytes = match parse_multipart(multipart).await {
             Ok(audio_bytes) => audio_bytes,
             Err(e) => return Err(e),
@@ -68,16 +87,16 @@ pub async fn create_diary(
             )
             .await?;
 
-        Ok(())
+        Ok(diary_id)
     }
     .await;
 
     match result {
-        Ok(_) => {
+        Ok(id) => {
             if let Err(e) = tx.commit().await {
                 Err(e.to_string().into())
             } else {
-                Ok(())
+                Ok(id.to_string())
             }
         }
         Err(e) => {

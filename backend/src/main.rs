@@ -4,7 +4,11 @@ use axum::{
     Router,
 };
 use recordiary::{
-    handlers::{calendar::get_calendar, diary::create_diary, health::healthcheck},
+    handlers::{
+        calendar::get_calendar,
+        diary::{create_diary, get_diaries},
+        health::healthcheck,
+    },
     AppState,
 };
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -23,10 +27,11 @@ async fn main() {
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
+
     let app = Router::new()
         .route("/", get(healthcheck))
         .route("/calendar", get(get_calendar))
-        .route("/diary", post(create_diary))
+        .route("/diary", post(create_diary).get(get_diaries))
         .with_state(AppState::default().await)
         .layer(DefaultBodyLimit::max(20 * 1024 * 1024 /* 20mb */));
 

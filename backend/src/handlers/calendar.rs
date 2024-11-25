@@ -6,12 +6,13 @@ use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use time::OffsetDateTime;
+use uuid::Uuid;
 
 use crate::db::diary::{get_diaries_of_month, Diary};
 
 #[derive(Deserialize, Debug)]
 pub struct GetCalendarParams {
-    user_id: String,
+    user_id: Uuid,
     year: u32,
     month: u32,
 }

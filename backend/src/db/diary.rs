@@ -37,11 +37,24 @@ impl DiaryParams {
     }
 }
 
+pub async fn get_diaries(
+    tx: &PgPool,
+    user_id: Uuid,
+    diary_ids: Vec<i64>,
+) -> anyhow::Result<Vec<Diary>> {
+    let resp: Vec<Diary> = sqlx::query_as("SELECT * FROM diary WHERE user_id = $1 AND id IN ($2)")
+        .bind(user_id)
+        .bind(&diary_ids)
+        .fetch_all(tx)
+        .await?;
+    Ok(resp)
+}
+
 pub async fn get_diaries_of_month(
     pool: &PgPool,
     year: u32,
     month: u32,
-    user_id: String,
+    user_id: Uuid,
 ) -> anyhow::Result<Vec<Diary>> {
     // todo: connect to supabase and get diaries of user
     let resp: Vec<Diary> = sqlx::query_as(
@@ -52,7 +65,7 @@ pub async fn get_diaries_of_month(
     )
     .bind(year as i32)
     .bind(month as i32)
-    .bind(Uuid::parse_str(&user_id)?)
+    .bind(user_id)
     .fetch_all(pool)
     .await?;
     Ok(resp)
