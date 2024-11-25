@@ -5,15 +5,17 @@ pub struct SupabaseClient {
     supabase_url: String,
     api_key: String,
     client: Client,
+    audio_bucket: String,
 }
 
 impl SupabaseClient {
-    pub fn new(supabase_url: String, api_key: String) -> Self {
+    pub fn new(supabase_url: String, api_key: String, audio_bucket: String) -> Self {
         // TODO: proper auth initialization
         Self {
             supabase_url,
             api_key,
             client: Client::new(),
+            audio_bucket,
         }
     }
 
@@ -29,5 +31,19 @@ impl SupabaseClient {
         let resp = self.client.get(&url).send().await?;
 
         Ok(resp.bytes().await?.to_vec())
+    }
+
+    pub async fn upload_diary(&self, audio: Vec<u8>, filename: String) -> Result<(), ReqwestError> {
+        self.upload(self.audio_bucket.clone(), filename, audio)
+            .await
+    }
+
+    pub async fn upload(
+        &self,
+        bucket: String,
+        filename: String,
+        file: Vec<u8>,
+    ) -> Result<(), ReqwestError> {
+        todo!()
     }
 }

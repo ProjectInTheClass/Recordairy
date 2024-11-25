@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use sqlx::{types::Uuid, FromRow, PgPool};
+use sqlx::{types::Uuid, FromRow, PgConnection, PgPool, Row};
 use time::{Date, OffsetDateTime};
 
 #[derive(Deserialize, Serialize, FromRow, Debug)]
@@ -16,9 +16,25 @@ pub struct Diary {
 
 pub struct DiaryParams {
     user_id: Uuid,
-    audio_link: String,
-    summary: String,
+    audio_link: Option<String>,
+    summary: Option<String>,
     is_private: bool,
+}
+
+impl DiaryParams {
+    pub fn new(
+        user_id: Uuid,
+        audio_link: Option<String>,
+        summary: Option<String>,
+        is_private: bool,
+    ) -> Self {
+        Self {
+            user_id,
+            audio_link,
+            summary,
+            is_private,
+        }
+    }
 }
 
 pub async fn get_diaries_of_month(
@@ -42,16 +58,16 @@ pub async fn get_diaries_of_month(
     Ok(resp)
 }
 
-pub async fn insert_diary(pool: &PgPool, diary: DiaryParams) -> anyhow::Result<()> {
-    sqlx::query(
+pub async fn insert_diary(tx: &mut PgConnection, diary: DiaryParams) -> anyhow::Result<i64> {
+    let row = sqlx::query(
         "
-    INSERT INTO diary (user_id, audio_link, summary, is_private) VALUES ($1,$2,$3,$4)",
+    INSERT INTO diary (user_id, audio_link, summary, is_private) VALUES ($1,$2,$3,$4) RETURNING id",
     )
     .bind(diary.user_id)
     .bind(diary.audio_link)
     .bind(diary.summary)
     .bind(diary.is_private)
-    .execute(pool)
+    .fetch_one(tx)
     .await?;
-    Ok(())
+    Ok(row.try_get::<i64, _>("id")?)
 }
