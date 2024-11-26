@@ -44,6 +44,26 @@ impl SupabaseClient {
         filename: String,
         file: Vec<u8>,
     ) -> Result<(), ReqwestError> {
-        todo!()
+        let url: String = format!(
+            "{}/storage/v1/object/{}/{}",
+            self.supabase_url, bucket, filename
+        );
+
+        let resp = self
+            .client
+            .post(&url)
+            .header("apikey", &self.api_key)
+            .header("authorization", &format!("Bearer {}", &self.api_key))
+            .body(file)
+            .send()
+            .await?;
+
+        match resp {
+            r if r.status().is_success() => Ok(()),
+            r => {
+                tracing::error!("Error uploading file: {:?}", r);
+                Err(r.error_for_status().unwrap_err())
+            }
+        }
     }
 }

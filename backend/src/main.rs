@@ -33,7 +33,7 @@ async fn main() {
         .route("/calendar", get(get_calendar))
         .route("/diary", post(create_diary).get(get_diaries))
         .with_state(AppState::default().await)
-        .layer(DefaultBodyLimit::max(20 * 1024 * 1024 /* 20mb */));
+        .layer(DefaultBodyLimit::max(20 * 1024 * 1024 /* 20mb */)); // about 1 minute per mb
 
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
