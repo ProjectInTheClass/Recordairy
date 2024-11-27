@@ -6,7 +6,7 @@ use axum::{
 use recordiary::{
     handlers::{
         calendar::get_calendar,
-        diary::{create_diary, get_diaries},
+        diary::{create_diary, get_diary},
         health::healthcheck,
     },
     AppState,
@@ -31,7 +31,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(healthcheck))
         .route("/calendar", get(get_calendar))
-        .route("/diary", post(create_diary).get(get_diaries))
+        .route("/diary", post(create_diary).get(get_diary))
         .with_state(AppState::default().await)
         .layer(DefaultBodyLimit::max(20 * 1024 * 1024 /* 20mb */)); // about 1 minute per mb
 

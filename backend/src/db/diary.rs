@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{types::Uuid, FromRow, PgConnection, PgPool, Postgres};
 use time::{Date, OffsetDateTime};
 
-#[derive(Deserialize, Serialize, FromRow, Debug)]
+#[derive(Deserialize, Serialize, Clone, FromRow, Debug)]
 pub struct Diary {
     id: i64,
     #[serde(with = "time::serde::rfc3339")]

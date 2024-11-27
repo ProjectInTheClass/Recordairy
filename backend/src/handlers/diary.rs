@@ -16,14 +16,14 @@ use crate::{
 };
 
 #[derive(Deserialize, Clone, Debug)]
-pub struct GetDiariesParams {
+pub struct GetDiaryParams {
     user_id: Uuid,
-    diary_ids: Vec<i64>,
+    diary_id: i64,
 }
 
-pub struct GetDiariesRseponse(Vec<Diary>);
+pub struct GetDiaryRseponse(Diary);
 
-impl IntoResponse for GetDiariesRseponse {
+impl IntoResponse for GetDiaryRseponse {
     fn into_response(self) -> axum::response::Response {
         let diaries = self.0;
         let serialized = serde_json::to_string(&diaries);
@@ -36,13 +36,13 @@ impl IntoResponse for GetDiariesRseponse {
 }
 
 #[debug_handler(state = AppState)]
-pub async fn get_diaries(
+pub async fn get_diary(
     State(pool): State<PgPool>,
-    Query(params): Query<GetDiariesParams>,
-) -> axum::response::Result<GetDiariesRseponse> {
-    let diaries = crate::db::diary::get_diaries(&pool, params.user_id, params.diary_ids).await;
-    match diaries {
-        Ok(diaries) => Ok(GetDiariesRseponse(diaries)),
+    Query(params): Query<GetDiaryParams>,
+) -> axum::response::Result<GetDiaryRseponse> {
+    let diary = crate::db::diary::get_diaries(&pool, params.user_id, vec![params.diary_id]).await;
+    match diary {
+        Ok(diaries) => Ok(GetDiaryRseponse(diaries[0].clone())),
         Err(e) => Err(e.to_string().into()),
     }
 }
