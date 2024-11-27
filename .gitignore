@@ -64,6 +64,8 @@ fastlane/test_output
 
 .DS_Store
 
+# Backend - Rust
 target/
 .env
 .cargo/
+.sqlx

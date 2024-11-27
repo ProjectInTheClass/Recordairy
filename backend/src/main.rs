@@ -1,22 +1,42 @@
-use axum::{routing::get, Router};
-use recordiary::{
-    db::conn::initialize_conn_pool,
-    handlers::{calendar::get_calendar, health::healthcheck},
-    storage::client::SupabaseClient,
+use axum::{
+    extract::DefaultBodyLimit,
+    routing::{get, post},
+    Router,
 };
+use recordiary::{
+    handlers::{
+        calendar::get_calendar,
+        diary::{create_diary, get_diary},
+        health::healthcheck,
+    },
+    AppState,
+};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+                format!(
+                    "{}=debug,tower_http=debug,axum::rejection=trace",
+                    env!("CARGO_CRATE_NAME")
+                )
+                .into()
+            }),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
+
     let app = Router::new()
         .route("/", get(healthcheck))
         .route("/calendar", get(get_calendar))
-        .with_state(initialize_conn_pool().await)
-        .with_state(SupabaseClient::new(
-            std::env::var("SUPABASE_URL").unwrap(),
-            std::env::var("SUPABASE_KEY").unwrap(),
-        ));
+        .route("/diary", post(create_diary).get(get_diary))
+        .with_state(AppState::default().await)
+        .layer(DefaultBodyLimit::max(20 * 1024 * 1024 /* 20mb */)); // about 1 minute per mb
 
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    tracing::debug!("Listening on: {}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();
 }
