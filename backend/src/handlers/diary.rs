@@ -9,7 +9,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::{
-    db::diary::{insert_diary, Diary},
+    db::diary::{insert_diary, update_diary, Diary},
     storage::client::SupabaseClient,
     utils::{get_diary_filename, parse_multipart::parse_multipart},
     AppState,
@@ -80,13 +80,14 @@ pub async fn create_diary(
             ),
         )
         .await?;
-        storage_client
+        let audio_link = storage_client
             .upload_diary(
                 audio_bytes.to_vec(),
                 get_diary_filename(params.user_id, diary_id),
             )
             .await?;
 
+        update_diary(&mut tx, diary_id, Some(audio_link), None, None).await?;
         Ok(diary_id)
     }
     .await;

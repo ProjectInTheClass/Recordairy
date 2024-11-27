@@ -1,5 +1,6 @@
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use sqlx::{types::Uuid, FromRow, PgConnection, PgPool, Row};
+use sqlx::{types::Uuid, FromRow, PgConnection, PgPool, Postgres, Row};
 use time::{Date, OffsetDateTime};
 
 #[derive(Deserialize, Serialize, FromRow, Debug)]
@@ -9,8 +10,8 @@ pub struct Diary {
     pub created_at: OffsetDateTime,
     local_date: Date,
     user_id: Uuid,
-    audio_link: String,
-    summary: String,
+    audio_link: Option<String>,
+    summary: Option<String>,
     is_private: bool,
 }
 
@@ -42,11 +43,14 @@ pub async fn get_diaries(
     user_id: Uuid,
     diary_ids: Vec<i64>,
 ) -> anyhow::Result<Vec<Diary>> {
-    let resp: Vec<Diary> = sqlx::query_as("SELECT * FROM diary WHERE user_id = $1 AND id IN ($2)")
-        .bind(user_id)
-        .bind(&diary_ids)
-        .fetch_all(tx)
-        .await?;
+    let resp: Vec<Diary> = sqlx::query_as!(
+        Diary,
+        "SELECT * FROM diary WHERE user_id = $1 AND id = ANY($2)",
+        user_id,
+        &diary_ids
+    )
+    .fetch_all(tx)
+    .await?;
     Ok(resp)
 }
 
@@ -57,30 +61,62 @@ pub async fn get_diaries_of_month(
     user_id: Uuid,
 ) -> anyhow::Result<Vec<Diary>> {
     // todo: connect to supabase and get diaries of user
-    let resp: Vec<Diary> = sqlx::query_as(
+    let resp: Vec<Diary> = sqlx::query_as!(
+        Diary,
         "SELECT * FROM diary where 
     EXTRACT(YEAR from created_at) = $1 AND
     EXTRACT(MONTH from created_at) = $2 AND
     user_id = $3",
+        year as i32,
+        month as i32,
+        user_id
     )
-    .bind(year as i32)
-    .bind(month as i32)
-    .bind(user_id)
     .fetch_all(pool)
     .await?;
     Ok(resp)
 }
 
 pub async fn insert_diary(tx: &mut PgConnection, diary: DiaryParams) -> anyhow::Result<i64> {
-    let row = sqlx::query(
+    let row = sqlx::query!(
         "
     INSERT INTO diary (user_id, audio_link, summary, is_private) VALUES ($1,$2,$3,$4) RETURNING id",
+        diary.user_id,
+        diary.audio_link,
+        diary.summary,
+        diary.is_private
     )
-    .bind(diary.user_id)
-    .bind(diary.audio_link)
-    .bind(diary.summary)
-    .bind(diary.is_private)
     .fetch_one(tx)
     .await?;
-    Ok(row.try_get::<i64, _>("id")?)
+    Ok(row.id)
+}
+
+pub async fn update_diary(
+    tx: &mut PgConnection,
+    id: i64,
+    audio_link: Option<String>,
+    summary: Option<String>,
+    is_private: Option<bool>,
+) -> anyhow::Result<()> {
+    if audio_link.is_none() && summary.is_none() && is_private.is_none() {
+        return Ok(());
+    }
+    let mut qry_builder: sqlx::QueryBuilder<'_, Postgres> =
+        sqlx::query_builder::QueryBuilder::new("UPDATE diary SET ");
+    let mut separated = qry_builder.separated(", ");
+    if let Some(audio_link) = audio_link {
+        separated.push_unseparated("audio_link = ");
+        separated.push_bind(audio_link);
+    }
+    if let Some(summary) = summary {
+        separated.push_unseparated("summary = ");
+        separated.push_bind(summary);
+    }
+    if let Some(is_private) = is_private {
+        separated.push_unseparated("is_private = ");
+        separated.push_bind(is_private);
+    }
+
+    qry_builder.push(" WHERE id = ").push_bind(id);
+    qry_builder.build().execute(tx).await?;
+    Ok(())
 }
