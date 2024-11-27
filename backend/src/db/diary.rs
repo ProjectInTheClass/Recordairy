@@ -1,6 +1,5 @@
-use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use sqlx::{types::Uuid, FromRow, PgConnection, PgPool, Postgres, Row};
+use sqlx::{types::Uuid, FromRow, PgConnection, PgPool, Postgres};
 use time::{Date, OffsetDateTime};
 
 #[derive(Deserialize, Serialize, FromRow, Debug)]

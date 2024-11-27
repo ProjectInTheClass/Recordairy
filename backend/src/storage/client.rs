@@ -1,4 +1,7 @@
+use anyhow::anyhow;
+
 use reqwest::{Client, Error as ReqwestError};
+use serde_json::json;
 
 #[derive(Debug, Clone)]
 pub struct SupabaseClient {
@@ -37,11 +40,17 @@ impl SupabaseClient {
         &self,
         audio: Vec<u8>,
         filename: String,
-    ) -> Result<String, ReqwestError> {
+    ) -> Result<String, anyhow::Error> {
         self.upload(self.audio_bucket.clone(), filename.clone(), audio)
             .await?;
-        self.get_presigned_download_url(self.audio_bucket.clone(), filename)
-            .await
+        let presigned_suffix = self
+            .get_presigned_download_url(self.audio_bucket.clone(), filename)
+            .await?;
+
+        Ok(format!(
+            "{}/storage/v1/{}",
+            self.supabase_url, presigned_suffix
+        ))
     }
 
     pub async fn upload(
@@ -76,7 +85,7 @@ impl SupabaseClient {
         &self,
         bucket: String,
         filename: String,
-    ) -> Result<String, ReqwestError> {
+    ) -> Result<String, anyhow::Error> {
         let url = format!(
             "{}/storage/v1/object/sign/{}/{}",
             self.supabase_url, bucket, filename
@@ -87,15 +96,17 @@ impl SupabaseClient {
             .post(&url)
             .header("apikey", &self.api_key)
             .header("authorization", &format!("Bearer {}", &self.api_key))
-            .body(
-                "{
-        \"expiresIn\": 7776000        
-    }",
-            ) // 90 days
+            .json(&json!({
+                "expiresIn": 7776000, // 90 days
+            })) // 90 days
             .send()
             .await?;
 
         let json = resp.json::<serde_json::Value>().await?;
-        Ok(json["signedURL"].as_str().unwrap().to_string())
+        let Some(signed_url) = json["signedURL"].as_str() else {
+            let error_message = json["message"].as_str().unwrap().to_string();
+            return Err(anyhow!(error_message));
+        };
+        Ok(signed_url.to_string())
     }
 }
