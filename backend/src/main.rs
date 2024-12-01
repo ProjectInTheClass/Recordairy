@@ -36,7 +36,9 @@ async fn main() {
         .layer(DefaultBodyLimit::max(20 * 1024 * 1024 /* 20mb */)); // about 1 minute per mb
 
     // run our app with hyper, listening globally on port 3000
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", env!("PORT")))
+        .await
+        .unwrap();
     tracing::debug!("Listening on: {}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();
 }
