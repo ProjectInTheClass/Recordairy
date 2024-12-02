@@ -191,10 +191,160 @@ struct CalendarView: View {
         }
         .padding()
     }
-/*
+    
     private func modalContent(for date: Date) -> some View {
+        GeometryReader { geometry in
+            VStack(spacing: 16) {
+                // 상단 닫기 버튼
+                HStack {
+                    Button(action: {
+                        selectedDate = nil // 모달 닫기
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(Color(hex: "#E0E0E0"))
+                                .frame(width: 44, height: 44)
+                            Image(systemName: "xmark")
+                                .font(.system(size: 20))
+                                .foregroundColor(.white)
+                        }
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 16) // 닫기 버튼 기준 정렬
+                .padding(.top, geometry.safeAreaInsets.top + 8) // 안전 영역 추가
+
+                if let entry = entries.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        // 가구 사진 및 날짜 정보
+                        HStack(spacing: 16) {
+                            RoundedRectangle(cornerRadius: 21)
+                                .fill(Color(hex: "#E0E0E0"))
+                                .frame(width: 100, height: 100)
+                                .overlay(
+                                    Image(systemName: "photo")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(.gray)
+                                        .padding(8)
+                                )
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("가구 이름")
+                                    .font(.system(size: 18, weight: .semibold))
+                                Text(date, formatter: dateFormatter)
+                                    .font(.system(size: 16, weight: .medium))
+                                    .foregroundColor(.gray)
+                            }
+
+                            Spacer()
+
+                            // 재생 버튼
+                            Button(action: {
+                                print("녹음 재생 버튼 클릭")
+                            }) {
+                                ZStack {
+                                    Circle()
+                                        .fill(Color(hex: "#6DAFCF"))
+                                        .frame(width: 56, height: 56)
+                                    Image(systemName: "play.fill")
+                                        .font(.system(size: 20))
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 16) // 닫기 버튼과 정렬 맞춤
+
+                        Divider()
+                            .padding(.vertical, 8)
+
+                        // 감정 추출 결과
+                    
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("감정 추출 결과")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(Color(hex: "#6DAFCF"))
+
+                            Text(entry.emotion.rawValue)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.white)
+                                .padding(8)
+                                .background(entry.emotion.color)
+                                .cornerRadius(20) // 둥글게 변경
+                        }
+                        .padding(.horizontal, 16) // 정렬 유지
+
+                        Divider()
+                            .padding(.vertical, 8)
+
+                        // 키워드 요약
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("키워드 요약")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(Color(hex: "#6DAFCF"))
+
+                            HStack(spacing: 8) {
+                                Text("키워드 1")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.white)
+                                    .padding(8)
+                                    .background(Color(hex: "#6DAFCF"))
+                                    .cornerRadius(20) // 둥글게 변경
+
+                                Text("키워드 2")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.white)
+                                    .padding(8)
+                                    .background(Color(hex: "#6DAFCF"))
+                                    .cornerRadius(20) // 둥글게 변경
+                            }
+                        }
+                        .padding(.horizontal, 16) // 정렬 유지
+
+                        Divider()
+                            .padding(.vertical, 8)
+
+                        // 텍스트
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("텍스트")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(Color(hex: "#6DAFCF"))
+
+                            Text(entry.transcribedText)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.black)
+                                .multilineTextAlignment(.leading)
+                                .lineSpacing(4)
+                        }
+                        .padding(.horizontal, 16) // 닫기 버튼과 정렬 맞춤
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading) // 전체 왼쪽 정렬
+                } else {
+                    // 일기가 없는 경우
+                    VStack(spacing: 16) {
+                        Text("해당 날짜에 녹음된 일기가 없습니다.")
+                            .font(.headline)
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+
+                        Spacer() // 고정 높이를 유지하기 위해 추가
+                    }
+                    .frame(maxHeight: 300) // 최소 높이 설정
+                }
+
+                Spacer()
+            }
+            .padding(.vertical, 16)
+            .background(Color(hex: "#FFFDF7").ignoresSafeArea()) // 배경색
+            .presentationDetents([.medium, .large]) // 시트 높이 설정
+            .presentationDragIndicator(.hidden) // 드래그 인디케이터 숨기기
+        }
+    }
+
+
+  /*  private func modalContent(for date: Date) -> some View {
         VStack(spacing: 16) {
-            // 상단 닫기 버튼
+            // 닫기 버튼
             HStack {
                 Button(action: {
                     selectedDate = nil // 모달 닫기
@@ -208,59 +358,61 @@ struct CalendarView: View {
                             .foregroundColor(.white)
                     }
                 }
-                Spacer()
+                Spacer() // 닫기 버튼 왼쪽 고정
             }
             .padding(.horizontal)
+            .padding(.top, 8) // 경계 아래 간격
 
             if let entry = entries.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
-                // 상단 이미지와 날짜 정보
-                HStack(spacing: 16) {
-                    RoundedRectangle(cornerRadius: 21)
-                        .fill(Color(hex: "#E0E0E0"))
-                        .frame(width: 100, height: 100)
-                        .overlay(
-                            Image(systemName: "photo")
-                                .resizable()
-                                .scaledToFit()
+                VStack(spacing: 16) {
+                    // 상단 이미지와 날짜 정보
+                    HStack(spacing: 16) {
+                        RoundedRectangle(cornerRadius: 21)
+                            .fill(Color(hex: "#E0E0E0"))
+                            .frame(width: 100, height: 100)
+                            .overlay(
+                                Image(systemName: "photo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .foregroundColor(.gray)
+                                    .padding(8)
+                            )
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("가구 이름")
+                                .font(.system(size: 18, weight: .semibold))
+                            Text(date, formatter: dateFormatter)
+                                .font(.system(size: 16, weight: .medium))
                                 .foregroundColor(.gray)
-                                .padding(8)
-                        )
+                        }
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("가구 이름")
-                            .font(.system(size: 18, weight: .semibold))
-                        Text(date, formatter: dateFormatter)
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.gray)
-                    }
+                        Spacer()
 
-                    Spacer()
-
-                    // 재생 버튼
-                    Button(action: {
-                        print("녹음 재생 버튼 클릭")
-                    }) {
-                        ZStack {
-                            Circle()
-                                .fill(Color(hex: "#6DAFCF"))
-                                .frame(width: 56, height: 56)
-                            Image(systemName: "play.fill")
-                                .font(.system(size: 20))
-                                .foregroundColor(.white)
+                        // 재생 버튼
+                        Button(action: {
+                            print("녹음 재생 버튼 클릭")
+                        }) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color(hex: "#6DAFCF"))
+                                    .frame(width: 56, height: 56)
+                                Image(systemName: "play.fill")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(.white)
+                            }
                         }
                     }
-                }
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                Divider()
-                    .padding(.vertical, 8)
+                    Divider()
+                        .padding(.vertical, 8)
 
-                // 감정 추출 결과
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("감정 추출 결과")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color(hex: "#6DAFCF"))
+                    // 감정 추출 결과
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("감정 추출 결과")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(Color(hex: "#6DAFCF"))
 
-                    HStack {
                         Text(entry.emotion.rawValue)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.white)
@@ -268,188 +420,63 @@ struct CalendarView: View {
                             .background(entry.emotion.color)
                             .cornerRadius(8)
                     }
-                }
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                Divider()
-                    .padding(.vertical, 8)
+                    Divider()
+                        .padding(.vertical, 8)
 
-                // 키워드 요약
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("키워드 요약")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color(hex: "#6DAFCF"))
+                    // 키워드 요약
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("키워드 요약")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(Color(hex: "#6DAFCF"))
 
-                    HStack {
-                        Text("키워드 1")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.white)
-                            .padding(8)
-                            .background(Color(hex: "#6DAFCF"))
-                            .cornerRadius(8)
-
-                        Text("키워드 2")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.white)
-                            .padding(8)
-                            .background(Color(hex: "#6DAFCF"))
-                            .cornerRadius(8)
-                    }
-                }
-
-                Divider()
-                    .padding(.vertical, 8)
-
-                // 텍스트
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("텍스트")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color(hex: "#6DAFCF"))
-
-                    Text(entry.transcribedText)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.black)
-                        .multilineTextAlignment(.leading)
-                        .lineSpacing(4)
-                }
-            } else {
-                Text("해당 날짜에 녹음된 일기가 없습니다.")
-                    .font(.headline)
-                    .foregroundColor(.gray)
-            }
-
-            Spacer()
-        }
-        .padding(16)
-        .background(Color(hex: "#FFFDF7").ignoresSafeArea()) // 모달 배경색
-        .presentationDetents([.medium, .large]) // 중형 및 대형 디텐트
-        .presentationDragIndicator(.hidden) // 드래그 인디케이터 숨기기
-    }
-*/
-    private func modalContent(for date: Date) -> some View {
-        VStack(spacing: 16) {
-            // 상단 닫기 버튼
-            HStack {
-                Button(action: {
-                    selectedDate = nil // 모달 닫기
-                }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(hex: "#E0E0E0"))
-                            .frame(width: 44, height: 44)
-                        Image(systemName: "xmark")
-                            .font(.system(size: 20))
-                            .foregroundColor(.white)
-                    }
-                }
-                Spacer()
-            }
-            .padding(.horizontal)
-
-            if let entry = entries.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
-                // 상단 이미지와 날짜 정보
-                HStack(spacing: 16) {
-                    RoundedRectangle(cornerRadius: 21)
-                        .fill(Color(hex: "#E0E0E0"))
-                        .frame(width: 100, height: 100)
-                        .overlay(
-                            Image(systemName: "photo")
-                                .resizable()
-                                .scaledToFit()
-                                .foregroundColor(.gray)
-                                .padding(8)
-                        )
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("가구 이름")
-                            .font(.system(size: 18, weight: .semibold))
-                        Text(date, formatter: dateFormatter)
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.gray)
-                    }
-
-                    Spacer()
-
-                    // 재생 버튼
-                    Button(action: {
-                        print("녹음 재생 버튼 클릭")
-                    }) {
-                        ZStack {
-                            Circle()
-                                .fill(Color(hex: "#6DAFCF"))
-                                .frame(width: 56, height: 56)
-                            Image(systemName: "play.fill")
-                                .font(.system(size: 20))
+                        HStack(spacing: 8) {
+                            Text("키워드 1")
+                                .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(.white)
+                                .padding(8)
+                                .background(Color(hex: "#6DAFCF"))
+                                .cornerRadius(8)
+
+                            Text("키워드 2")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.white)
+                                .padding(8)
+                                .background(Color(hex: "#6DAFCF"))
+                                .cornerRadius(8)
                         }
                     }
-                }
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                Divider()
-                    .padding(.vertical, 8)
+                    Divider()
+                        .padding(.vertical, 8)
 
-                // 감정 추출 결과
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("감정 추출 결과")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color(hex: "#6DAFCF"))
+                    // 텍스트
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("텍스트")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(Color(hex: "#6DAFCF"))
 
-                    Text(entry.emotion.rawValue)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.white)
-                        .padding(8)
-                        .background(entry.emotion.color)
-                        .cornerRadius(8)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                Divider()
-                    .padding(.vertical, 8)
-
-                // 키워드 요약
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("키워드 요약")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color(hex: "#6DAFCF"))
-
-                    HStack {
-                        Text("키워드 1")
+                        Text(entry.transcribedText)
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.white)
-                            .padding(8)
-                            .background(Color(hex: "#6DAFCF"))
-                            .cornerRadius(8)
-
-                        Text("키워드 2")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.white)
-                            .padding(8)
-                            .background(Color(hex: "#6DAFCF"))
-                            .cornerRadius(8)
+                            .foregroundColor(.black)
+                            .multilineTextAlignment(.leading)
+                            .lineSpacing(4)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                Divider()
-                    .padding(.vertical, 8)
-
-                // 텍스트
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("텍스트")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(Color(hex: "#6DAFCF"))
-
-                    Text(entry.transcribedText)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.black)
-                        .multilineTextAlignment(.leading)
-                        .lineSpacing(4)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
             } else {
-                Text("해당 날짜에 녹음된 일기가 없습니다.")
-                    .font(.headline)
-                    .foregroundColor(.gray)
-                    .frame(maxWidth: .infinity, alignment: .center)
+                // 일기가 없는 경우
+                VStack(spacing: 16) {
+                    Text("해당 날짜에 녹음된 일기가 없습니다.")
+                        .font(.headline)
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+
+                    Spacer() // 고정 높이를 유지하기 위해 추가
+                }
+                .frame(maxHeight: 300) // 최소 높이 설정
             }
 
             Spacer()
@@ -458,7 +485,7 @@ struct CalendarView: View {
         .background(Color(hex: "#FFFDF7").ignoresSafeArea()) // 모달 배경색
         .presentationDetents([.medium, .large]) // 중형 및 대형 디텐트
         .presentationDragIndicator(.hidden) // 드래그 인디케이터 숨기기
-    }
+    }*/
 
     private func colorForDate(_ date: Date) -> Color {
         if let entry = entries.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
