@@ -61,7 +61,7 @@ pub async fn get_deco(
 pub struct CreateDecoParams {
     name: String,
     display_name: Option<String>,
-    category: String,
+    category: Option<String>,
     is_valid: bool,
 }
 
@@ -89,27 +89,22 @@ pub async fn create_deco(
     let mut tx = get_pg_tx(pool).await?;
 
     let result: anyhow::Result<Deco> = async {
-        let (model_bytes, model_metadata) = match parse_multipart(multipart).await {
-            Ok(model_data) => {
-                if model_data.1.file_name.is_empty() {
-                    return Err(anyhow::anyhow!("Model file name is empty"));
-                }
-                model_data
-            }
+        let (model_bytes, _model_metadata) = match parse_multipart(multipart).await {
+            Ok(model_data) => model_data,
             Err(e) => return Err(e),
         };
         // upload model to storage
         let url = storage_client
-            .upload_model(model_bytes.to_vec(), model_metadata.file_name)
+            .upload_model(model_bytes.to_vec(), params.name.clone())
             .await?;
 
         let deco = crate::db::deco::create_deco(
             &mut tx,
             crate::db::deco::CreateDecoParams {
-                name: params.name.clone(),
-                display_name: params.display_name.clone(),
-                category: params.category.clone(),
-                asset_link: Some(url),
+                name: params.name,
+                display_name: params.display_name,
+                category: params.category,
+                asset_link: url,
                 is_valid: params.is_valid,
             },
         )

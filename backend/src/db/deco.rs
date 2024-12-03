@@ -27,8 +27,8 @@ pub async fn get_deco(tx: &mut PgConnection, deco_id: i64) -> anyhow::Result<Dec
 pub struct CreateDecoParams {
     pub name: String,
     pub display_name: Option<String>,
-    pub category: String,
-    pub asset_link: Option<String>,
+    pub category: Option<String>,
+    pub asset_link: String,
     pub is_valid: bool,
 }
 

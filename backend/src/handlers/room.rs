@@ -2,6 +2,7 @@ use axum::{
     debug_handler,
     extract::{Query, State},
     response::IntoResponse,
+    Json,
 };
 use hyper::StatusCode;
 use serde::Deserialize;
@@ -113,7 +114,6 @@ pub struct UpdateRoomParams {
     user_id: Uuid,
     diary_id: i64,
     deco_id: i64,
-    coordinates: Option<Coordinates>,
 }
 
 pub struct UpdateRoomResponse;
@@ -128,6 +128,7 @@ impl IntoResponse for UpdateRoomResponse {
 pub async fn update_user_deco(
     State(pool): State<PgPool>,
     Query(params): Query<UpdateRoomParams>,
+    Json(coordinates): Json<Option<Coordinates>>,
 ) -> axum::response::Result<UpdateRoomResponse> {
     let mut tx = get_pg_tx(pool).await?;
     let res = crate::db::user_deco::update_user_deco(
@@ -135,7 +136,7 @@ pub async fn update_user_deco(
         params.user_id,
         params.diary_id,
         params.deco_id,
-        params.coordinates,
+        coordinates,
     )
     .await;
 
