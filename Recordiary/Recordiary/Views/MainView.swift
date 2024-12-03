@@ -74,4 +74,3 @@ struct MainView: View {
         .accentColor(Color(hex: "#6DAFCF")) // 선택된 탭 아이콘 색상 설정
     }
 }
-
