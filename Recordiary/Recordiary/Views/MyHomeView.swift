@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MyHomeView: View {
     @StateObject private var libraryViewModel = LibraryViewModel() // LibraryViewModel 사용
+    @StateObject private var storageViewModel = StorageViewModel() // StorageViewModel 추가
     @State private var isLibrarySheetPresented = false // 모달 시트 상태
     @State private var isStorageSheetPresented = false // 보관함 모달 상태
 
@@ -49,7 +50,7 @@ struct MyHomeView: View {
                     }
                 }
 
-                // 두 번째 버튼 - "tray"
+                // 두 번째 버튼 - "tray" (보관함 모달 표시)
                 Button(action: {
                     isStorageSheetPresented = true
                 }) {
@@ -62,7 +63,7 @@ struct MyHomeView: View {
                 }
                 .sheet(isPresented: $isStorageSheetPresented) {
                     CustomModal {
-                        StorageModalContent(isPresented: $isStorageSheetPresented)
+                        StorageModalContent(isPresented: $isStorageSheetPresented, viewModel: storageViewModel) // ViewModel 전달
                     }
                 }
             }
@@ -158,7 +159,9 @@ struct LibraryModalContent: View {
 
 struct StorageModalContent: View {
     @Binding var isPresented: Bool // 모달 상태 바인딩
-    @StateObject private var viewModel = StorageViewModel() // ViewModel 사용
+    @ObservedObject var viewModel: StorageViewModel // 부모 뷰에서 전달된 ViewModel
+    @State private var showAlert = false // 경고창 표시 여부
+    @State private var itemToDelete: Furniture? // 삭제할 가구
 
     var body: some View {
         VStack(spacing: 16) {
@@ -225,7 +228,7 @@ struct StorageModalContent: View {
                                     }
                                 }
 
-                                // 우측 추가 및 삭제 버튼 (동작 없음)
+                                // 우측 추가 및 삭제 버튼
                                 HStack(spacing: 8) {
                                     Button(action: {
                                         // 추가 버튼: 현재 동작 없음
@@ -241,7 +244,9 @@ struct StorageModalContent: View {
                                     }
 
                                     Button(action: {
-                                        // 삭제 버튼: 현재 동작 없음
+                                        // 삭제 버튼 동작
+                                        itemToDelete = item
+                                        showAlert = true
                                     }) {
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 21)
@@ -264,8 +269,24 @@ struct StorageModalContent: View {
                 }
             }
         }
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text("\(itemToDelete?.name ?? "가구")를 삭제하시겠습니까?"),
+                message: Text("삭제된 가구는 라이브러리에 추가되며,\n음성은 달력 탭에서 확인할 수 있습니다."),
+                primaryButton: .destructive(Text("삭제"), action: {
+                    if let item = itemToDelete {
+                        viewModel.deleteItem(item)
+                        itemToDelete = nil
+                    }
+                }),
+                secondaryButton: .cancel(Text("취소"), action: {
+                    itemToDelete = nil
+                })
+            )
+        }
     }
 }
+
 
 struct StorageFurnitureDetailView: View {
     let furniture: Furniture // 가구 정보
