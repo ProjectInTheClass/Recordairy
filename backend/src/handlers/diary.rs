@@ -62,8 +62,8 @@ pub async fn create_diary(
 ) -> axum::response::Result<String> {
     let mut tx = get_pg_tx(pool).await?;
     let result: anyhow::Result<_> = async {
-        let audio_bytes = match parse_multipart(multipart).await {
-            Ok(audio_bytes) => audio_bytes,
+        let (audio_bytes, _audio_metadata) = match parse_multipart(multipart).await {
+            Ok(audio_data) => audio_data,
             Err(e) => return Err(e),
         };
         // upload diary to database first to retrieve ID
