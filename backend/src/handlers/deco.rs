@@ -36,8 +36,19 @@ pub async fn get_deco(
     let mut tx = get_pg_tx(pool).await?;
     let deco = crate::db::deco::get_deco(&mut tx, params.deco_id).await;
     match deco {
-        Ok(deco) => Ok(GetDecoRseponse(deco)),
-        Err(e) => Err(e.to_string().into()),
+        Ok(deco) => {
+            if let Err(e) = tx.commit().await {
+                Err(e.to_string().into())
+            } else {
+                Ok(GetDecoRseponse(deco))
+            }
+        }
+        Err(e) => {
+            if let Err(rollback_e) = tx.rollback().await {
+                tracing::error!("Failed to rollback transaction: {}", rollback_e);
+            }
+            Err(e.to_string().into())
+        }
     }
 }
 
@@ -61,7 +72,18 @@ pub async fn get_available_decos(
     let mut tx = get_pg_tx(pool).await?;
     let decos = crate::db::deco::get_available_decos(&mut tx).await;
     match decos {
-        Ok(decos) => Ok(GetAvailableDecosResponse(decos)),
-        Err(e) => Err(e.to_string().into()),
+        Ok(decos) => {
+            if let Err(e) = tx.commit().await {
+                Err(e.to_string().into())
+            } else {
+                Ok(GetAvailableDecosResponse(decos))
+            }
+        }
+        Err(e) => {
+            if let Err(rollback_e) = tx.rollback().await {
+                tracing::error!("Failed to rollback transaction: {}", rollback_e);
+            }
+            Err(e.to_string().into())
+        }
     }
 }

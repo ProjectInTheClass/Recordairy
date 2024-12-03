@@ -44,7 +44,62 @@ pub async fn get_room(
     )
     .await;
     match user_decos {
-        Ok(user_decos) => Ok(GetRoomResponse(user_decos)),
-        Err(e) => Err(e.to_string().into()),
+        Ok(user_decos) => {
+            if let Err(e) = tx.commit().await {
+                Err(e.to_string().into())
+            } else {
+                Ok(GetRoomResponse(user_decos))
+            }
+        }
+        Err(e) => {
+            if let Err(rollback_e) = tx.rollback().await {
+                tracing::error!("Failed to rollback transaction: {}", rollback_e);
+            }
+            Err(e.to_string().into())
+        }
+    }
+}
+
+#[derive(Deserialize, Clone, Debug)]
+pub struct CreateDecoParams {
+    user_id: Uuid,
+    diary_id: i64,
+    deco_id: i64,
+}
+
+pub struct CreateDecoResponse;
+impl IntoResponse for CreateDecoResponse {
+    fn into_response(self) -> axum::response::Response {
+        (StatusCode::OK, "").into_response()
+    }
+}
+
+#[debug_handler(state = AppState)]
+pub async fn create_deco(
+    State(pool): State<PgPool>,
+    Query(params): Query<CreateDecoParams>,
+) -> axum::response::Result<CreateDecoResponse> {
+    let mut tx = get_pg_tx(pool).await?;
+    let res = crate::db::user_deco::create_user_deco(
+        &mut tx,
+        params.user_id,
+        params.diary_id,
+        params.deco_id,
+    )
+    .await;
+
+    match res {
+        Ok(_) => {
+            if let Err(e) = tx.commit().await {
+                return Err(e.to_string().into());
+            }
+            Ok(CreateDecoResponse)
+        }
+        Err(e) => {
+            if let Err(rollback_e) = tx.rollback().await {
+                tracing::error!("Failed to rollback transaction: {}", rollback_e);
+            }
+            Err(e.to_string().into())
+        }
     }
 }

@@ -1,5 +1,6 @@
 use uuid::Uuid;
 
+pub mod coordinates;
 pub mod internal_error;
 pub mod parse_multipart;
 pub mod sqlx;
