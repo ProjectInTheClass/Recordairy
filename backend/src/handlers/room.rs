@@ -8,7 +8,11 @@ use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::{db::user_deco::UserDeco, utils::sqlx::get_pg_tx, AppState};
+use crate::{
+    db::user_deco::UserDeco,
+    utils::{coordinates::Coordinates, sqlx::get_pg_tx},
+    AppState,
+};
 
 #[derive(Deserialize, Clone, Debug)]
 pub struct GetRoomParams {
@@ -75,7 +79,7 @@ impl IntoResponse for CreateDecoResponse {
 }
 
 #[debug_handler(state = AppState)]
-pub async fn create_deco(
+pub async fn create_user_deco(
     State(pool): State<PgPool>,
     Query(params): Query<CreateDecoParams>,
 ) -> axum::response::Result<CreateDecoResponse> {
@@ -94,6 +98,53 @@ pub async fn create_deco(
                 return Err(e.to_string().into());
             }
             Ok(CreateDecoResponse)
+        }
+        Err(e) => {
+            if let Err(rollback_e) = tx.rollback().await {
+                tracing::error!("Failed to rollback transaction: {}", rollback_e);
+            }
+            Err(e.to_string().into())
+        }
+    }
+}
+
+#[derive(Deserialize, Clone, Debug)]
+pub struct UpdateRoomParams {
+    user_id: Uuid,
+    diary_id: i64,
+    deco_id: i64,
+    coordinates: Option<Coordinates>,
+}
+
+pub struct UpdateRoomResponse;
+
+impl IntoResponse for UpdateRoomResponse {
+    fn into_response(self) -> axum::response::Response {
+        (StatusCode::OK, "").into_response()
+    }
+}
+
+#[debug_handler(state = AppState)]
+pub async fn update_user_deco(
+    State(pool): State<PgPool>,
+    Query(params): Query<UpdateRoomParams>,
+) -> axum::response::Result<UpdateRoomResponse> {
+    let mut tx = get_pg_tx(pool).await?;
+    let res = crate::db::user_deco::update_user_deco(
+        &mut tx,
+        params.user_id,
+        params.diary_id,
+        params.deco_id,
+        params.coordinates,
+    )
+    .await;
+
+    match res {
+        Ok(_) => {
+            if let Err(e) = tx.commit().await {
+                return Err(e.to_string().into());
+            }
+            Ok(UpdateRoomResponse)
         }
         Err(e) => {
             if let Err(rollback_e) = tx.rollback().await {

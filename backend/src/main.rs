@@ -9,6 +9,7 @@ use recordiary::{
         deco::{get_available_decos, get_deco},
         diary::{create_diary, get_diary},
         health::healthcheck,
+        room::{create_user_deco, get_room, update_user_deco},
     },
     AppState,
 };
@@ -35,6 +36,7 @@ async fn main() {
         .route("/diary", post(create_diary).get(get_diary))
         .route("/deco", get(get_deco))
         .route("/deco/available", get(get_available_decos))
+        .route("/room", get(get_room).post(create_user_deco).put(update_user_deco))
         .with_state(AppState::default().await)
         .layer(DefaultBodyLimit::max(20 * 1024 * 1024 /* 20mb */)); // about 1 minute per mb
 

@@ -92,7 +92,6 @@ pub async fn update_user_deco(
     user_id: Uuid,
     diary_id: i64,
     deco_id: i64,
-    is_placed: bool,
     coordinates: Option<Coordinates>,
 ) -> sqlx::Result<()> {
     let coordinates: Option<serde_json::Value> = coordinates.map(|c| json!(c));
@@ -103,7 +102,7 @@ pub async fn update_user_deco(
         SET is_placed = $1, coordinates = $2
         WHERE user_id = $3 AND diary_id = $4 AND deco_id = $5
         ",
-        is_placed,
+        coordinates.is_some(),
         coordinates,
         user_id,
         diary_id,
