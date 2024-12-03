@@ -11,7 +11,7 @@ use uuid::Uuid;
 use crate::{
     db::diary::{insert_diary, update_diary, Diary},
     storage::client::SupabaseClient,
-    utils::{get_diary_filename, parse_multipart::parse_multipart},
+    utils::{get_diary_filename, parse_multipart::parse_multipart, sqlx::get_pg_tx},
     AppState,
 };
 
@@ -60,13 +60,10 @@ pub async fn create_diary(
     Query(params): Query<CreateDiaryParams>,
     multipart: Multipart,
 ) -> axum::response::Result<String> {
-    let mut tx = match pool.begin().await {
-        Ok(tx) => tx,
-        Err(e) => return Err(e.to_string().into()),
-    };
+    let mut tx = get_pg_tx(pool).await?;
     let result: anyhow::Result<_> = async {
-        let audio_bytes = match parse_multipart(multipart).await {
-            Ok(audio_bytes) => audio_bytes,
+        let (audio_bytes, _audio_metadata) = match parse_multipart(multipart).await {
+            Ok(audio_data) => audio_data,
             Err(e) => return Err(e),
         };
         // upload diary to database first to retrieve ID

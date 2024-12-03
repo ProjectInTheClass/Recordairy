@@ -1,13 +1,27 @@
 use axum::{body::Bytes, extract::Multipart};
 
-pub async fn parse_multipart(mut multipart: Multipart) -> anyhow::Result<Bytes> {
+pub struct MultipartMetadata {
+    pub name: String,
+    pub file_name: String,
+    pub content_type: String,
+}
+
+pub async fn parse_multipart(
+    mut multipart: Multipart,
+) -> anyhow::Result<(Bytes, MultipartMetadata)> {
     if let Some(field) = multipart.next_field().await? {
-        let _name = field.name().unwrap_or("").to_string();
-        let _file_name = field.file_name().unwrap_or("").to_string();
-        let _content_type = field.content_type().unwrap_or("").to_string();
+        // TODO: robust way of attaching names to files
+        let name = field.name().unwrap_or("").to_string();
+        let file_name = field.file_name().unwrap_or("").to_string();
+        let content_type = field.content_type().unwrap_or("").to_string();
+        let metadata = MultipartMetadata {
+            name,
+            file_name,
+            content_type,
+        };
         let data = field.bytes().await?;
 
-        Ok(data)
+        Ok((data, metadata))
     } else {
         Err(anyhow::anyhow!("No file uploaded"))
     }

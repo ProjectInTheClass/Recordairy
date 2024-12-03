@@ -21,6 +21,7 @@ impl AppState {
                 std::env::var("SUPABASE_URL").unwrap(),
                 std::env::var("SUPABASE_KEY").unwrap(),
                 std::env::var("SUPABASE_AUDIO_BUCKET").unwrap(),
+                std::env::var("SUPABASE_MODEL_BUCKET").unwrap(),
             ),
         }
     }

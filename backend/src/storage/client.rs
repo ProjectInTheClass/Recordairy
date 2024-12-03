@@ -9,16 +9,23 @@ pub struct SupabaseClient {
     api_key: String,
     client: Client,
     audio_bucket: String,
+    model_bucket: String,
 }
 
 impl SupabaseClient {
-    pub fn new(supabase_url: String, api_key: String, audio_bucket: String) -> Self {
+    pub fn new(
+        supabase_url: String,
+        api_key: String,
+        audio_bucket: String,
+        model_bucket: String,
+    ) -> Self {
         // TODO: proper auth initialization
         Self {
             supabase_url,
             api_key,
             client: Client::new(),
             audio_bucket,
+            model_bucket,
         }
     }
 
@@ -45,6 +52,23 @@ impl SupabaseClient {
             .await?;
         let presigned_suffix = self
             .get_presigned_download_url(self.audio_bucket.clone(), filename)
+            .await?;
+
+        Ok(format!(
+            "{}/storage/v1/{}",
+            self.supabase_url, presigned_suffix
+        ))
+    }
+
+    pub async fn upload_model(
+        &self,
+        model: Vec<u8>,
+        filename: String,
+    ) -> Result<String, anyhow::Error> {
+        self.upload(self.model_bucket.clone(), filename.clone(), model)
+            .await?;
+        let presigned_suffix = self
+            .get_presigned_download_url(self.model_bucket.clone(), filename)
             .await?;
 
         Ok(format!(

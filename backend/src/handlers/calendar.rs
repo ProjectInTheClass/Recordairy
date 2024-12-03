@@ -46,7 +46,6 @@ impl IntoResponse for CalendarDataResponse {
 }
 
 // fetch all calendar entries for the given user & year & month
-// TODO: join query to fetch deco as well
 pub async fn get_calendar(
     State(pool): State<PgPool>,
     Query(params): Query<GetCalendarParams>,
