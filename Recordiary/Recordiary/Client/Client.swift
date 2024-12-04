@@ -33,6 +33,22 @@ struct APIClient {
         }
     }
     
+    func postDiary(userId: String, isPrivate: Bool, audioFile: Data) async -> Result<Int64, AFError>{
+        return await withCheckedContinuation {
+            continuation in
+            AF.upload(
+                multipartFormData: { multipartFormData in
+                    multipartFormData.append(userId.data(using: .utf8)!, withName: "user_id")
+                    let is_private = if isPrivate {"true"}else {"false"}
+                    multipartFormData.append(is_private.data(using:.utf8)!,withName:"is_private")
+                    // Add the audio file data
+                    multipartFormData.append(audioFile, withName: "audio_file", fileName: "audio_file", mimeType: "audio/mpeg")
+                }, to: API_URL).responseDecodable(of: Int64.self) { response in
+                    continuation.resume(returning: response.result)
+                }
+        }
+    }
+    
     func getFurniture(id: Int64) async -> Result<FurnitureModel, AFError> {
         let parameters:[String:Int64] = [
             "deco_id": id
@@ -43,6 +59,15 @@ struct APIClient {
                     response in
                     continuation.resume(returning: response.result)
                 }
+        }
+    }
+    
+    func getAvailableFurniture() async -> Result<[FurnitureModel], AFError > {
+        return await withCheckedContinuation {
+            continuation in AF.request(API_URL+"/deco/available").responseDecodable(of: [FurnitureModel].self, decoder:decoder) {
+                response in
+                continuation.resume(returning: response.result)
+            }
         }
     }
 }
