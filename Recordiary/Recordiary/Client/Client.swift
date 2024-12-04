@@ -21,7 +21,6 @@ struct APIClient {
     }()
     
     func getDiary(userId: String, diaryId: Int64) async -> Result<DiaryModel,AFError> {
-        
         let parameters: [String: Any] = [
             "user_id": userId,
             "diary_id": diaryId
@@ -31,6 +30,19 @@ struct APIClient {
                 response in
                 continuation.resume(returning: response.result)
             }
+        }
+    }
+    
+    func getFurniture(id: Int64) async -> Result<FurnitureModel, AFError> {
+        let parameters:[String:Int64] = [
+            "deco_id": id
+        ];
+        return await withCheckedContinuation {
+            continuation in AF.request(API_URL+"/deco",parameters: parameters)
+                .responseDecodable(of:FurnitureModel.self, decoder:decoder) {
+                    response in
+                    continuation.resume(returning: response.result)
+                }
         }
     }
 }

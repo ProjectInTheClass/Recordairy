@@ -4,11 +4,12 @@
 //
 //  Created by RulerOfCakes on 12/4/24.
 //
+import Foundation
 
 struct FurnitureModel: Decodable {
     let id: Int
-    let createdAt: String
-    let updatedAt: String
+    let createdAt: Date
+    let updatedAt: Date
     let name: String
     let assetLink: String
     let category: String
