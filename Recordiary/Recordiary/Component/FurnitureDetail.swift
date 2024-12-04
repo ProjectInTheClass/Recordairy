@@ -7,14 +7,8 @@
 
 import SwiftUI
 
-struct Furniture: Identifiable {
-    let id = UUID() // 고유 ID
-    let name: String
-    let date: String
-}
-
 struct FurnitureDetailContent: View {
-    let furniture: Furniture // 가구 정보
+    let detailedFurniture: DiaryConnectedFurniture // 가구 정보
     @State private var isPlaying = false // 재생 상태 저장
 
     var body: some View {
@@ -34,9 +28,9 @@ struct FurnitureDetailContent: View {
                         )
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(furniture.name)
+                        Text(detailedFurniture.furniture.name)
                             .font(.system(size: 18, weight: .semibold))
-                        Text(furniture.date)
+                        Text(detailedFurniture.diary.local_date)
                             .font(.system(size: 16, weight: .medium))
                             .foregroundColor(.gray)
                     }
@@ -59,18 +53,56 @@ struct FurnitureDetailContent: View {
                 }
 
                 // 섹션
-                SectionView(title: "감정 추출 결과", content: "행복함", hasContentBox: false, contentBoxStyle: .highlighted)
-                SectionView(title: "키워드 요약", content: "즐거움, 웃음, 여행", hasContentBox: true, contentBoxStyle: .regular)
-                SectionView(title: "텍스트", content: "오늘은 정말 즐거운 하루였다.", hasContentBox: true, contentBoxStyle: .regular)
+                SectionView(title: "감정 추출 결과", content: detailedFurniture.diary.emotion.rawValue, hasContentBox: false, contentBoxStyle: .highlighted)
+                SectionView(title: "키워드 요약", content: detailedFurniture.diary.keyWord, hasContentBox: true, contentBoxStyle: .regular)
+                SectionView(title: "텍스트", content: detailedFurniture.diary.transcribedText, hasContentBox: true, contentBoxStyle: .regular)
             }
             .padding(16) // 모달 내 여백 추가
         }
     }
 }
 
+struct DiaryDetailContent: View {
+    let detailedDiary: DiaryEntry // 가구 정보
+    @State private var isPlaying = false // 재생 상태 저장
+
+    var body: some View {
+        ScrollView { // 스크롤 가능한 영역
+            VStack(alignment: .leading, spacing: 16) { // 전체 왼쪽 정렬
+                // 가구 이미지와 정보
+                HStack(spacing: 16) {
+                    Text(detailedDiary.local_date)
+                        .font(.system(size: 18, weight: .semibold))
+
+                    Spacer()
+                    Button(action: {
+                        isPlaying.toggle() // 재생 상태 토글
+                    }) {
+                        ZStack {
+                            Circle() // 동그란 버튼
+                                .fill(Color(hex: "#6DAFCF"))
+                                .frame(width: 56, height: 56)
+                            Image(systemName: isPlaying ? "pause.fill" : "play.fill") // 상태에 따라 아이콘 변경
+                                .font(.system(size: 20))
+                                .foregroundColor(.white)
+                        }
+                    }
+                }
+
+                // 섹션
+                SectionView(title: "감정 추출 결과", content: detailedDiary.emotion.rawValue, hasContentBox: false, contentBoxStyle: .highlighted)
+                SectionView(title: "키워드 요약", content: detailedDiary.keyWord, hasContentBox: true, contentBoxStyle: .regular)
+                SectionView(title: "텍스트", content: detailedDiary.transcribedText, hasContentBox: true, contentBoxStyle: .regular)
+            }
+            .padding(16) // 모달 내 여백 추가
+        }
+    }
+}
+
+
 struct SectionView: View {
     let title: String
-    let content: String
+    let content: String // 감정의 rawValue 또는 기타 텍스트
     let hasContentBox: Bool // 내용 박스 유무
     let contentBoxStyle: ContentBoxStyle // 내용 스타일
 
@@ -126,11 +158,29 @@ struct SectionView: View {
                     .frame(width: 67, height: 34) // 고정 크기
                     .background(
                         RoundedRectangle(cornerRadius: 40) // 곡률 40
-                            .fill(Color(hex: "#FFA726")) // 배경 색상
+                            .fill(colorForEmotion(content)) // 감정에 따른 색상 적용
                     )
                     .frame(maxWidth: .infinity, alignment: .leading) // 왼쪽 정렬
             }
         }
     }
+
+    // 감정에 따른 색상 결정
+    private func colorForEmotion(_ emotionRawValue: String) -> Color {
+        switch emotionRawValue {
+        case Emotion.anger.rawValue: return Emotion.anger.color
+        case Emotion.sadness.rawValue: return Emotion.sadness.color
+        case Emotion.happiness.rawValue: return Emotion.happiness.color
+        case Emotion.neutral.rawValue: return Emotion.neutral.color
+        default: return Color(hex: "#FFA726") // 기본 색상
+        }
+    }
 }
 
+
+func formatDate(_ date: Date) -> String {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .medium
+    formatter.locale = Locale(identifier: "ko_KR")
+    return formatter.string(from: date)
+}

@@ -9,27 +9,17 @@
 import Combine
 
 class StorageViewModel: ObservableObject {
-    @Published var items: [Furniture] = [
-        Furniture(name: "의자", date: "2023-11-18"),
-        Furniture(name: "테이블", date: "2023-11-10"),
-        Furniture(name: "소파", date: "2023-11-05")
-    ]
-    
-    @Published var selectedFurniture: Furniture? = nil // 선택된 가구
-    @Published var showDetails: Bool = false           // 상세 정보 표시 여부
+    @Published var items: [DiaryConnectedFurniture] = [] // is_set이 false인 연결된 가구들
+    @Published var selectedFurniture: DiaryConnectedFurniture? = nil // 선택된 가구
+    @Published var showDetails: Bool = false // 상세 정보 표시 여부
 
-    // 아이템 추가
-    func addItem(_ item: Furniture) {
-        items.append(item)
-    }
-
-    // 아이템 삭제
-    func deleteItem(_ item: Furniture) {
-        items.removeAll { $0.id == item.id }
+    // 초기화: 더미 데이터에서 is_set == false인 항목만 가져오기
+    init() {
+        self.items = diaryConnectedFurnitureDummyData.filter { !$0.is_set }
     }
 
     // 가구 선택
-    func selectFurniture(_ furniture: Furniture) {
+    func selectFurniture(_ furniture: DiaryConnectedFurniture) {
         selectedFurniture = furniture
         showDetails = true
     }
@@ -38,5 +28,10 @@ class StorageViewModel: ObservableObject {
     func backToList() {
         selectedFurniture = nil
         showDetails = false
+    }
+
+    // 가구 삭제
+    func deleteItem(_ item: DiaryConnectedFurniture) {
+        items.removeAll { $0.id == item.id }
     }
 }
