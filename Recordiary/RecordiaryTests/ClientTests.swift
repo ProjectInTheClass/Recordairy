@@ -33,4 +33,10 @@ struct ClientTests {
         #expect(components.month == 12)
         #expect(components.day == 3)
     }
+    
+    @Test func testGetRoom() async throws {
+        let result = await client.getRoom(userId: TEST_USER_ID, year: 2024, month: 11)
+        let room = try result.get()
+        #expect(room.count == 2)
+    }
 }

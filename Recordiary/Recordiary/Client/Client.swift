@@ -43,7 +43,7 @@ struct APIClient {
                     multipartFormData.append(is_private.data(using:.utf8)!,withName:"is_private")
                     // Add the audio file data
                     multipartFormData.append(audioFile, withName: "audio_file", fileName: "audio_file", mimeType: "audio/mpeg")
-                }, to: API_URL).responseDecodable(of: Int64.self) { response in
+                }, to: API_URL + "/diary").responseDecodable(of: Int64.self) { response in
                     continuation.resume(returning: response.result)
                 }
         }
@@ -68,6 +68,21 @@ struct APIClient {
                 response in
                 continuation.resume(returning: response.result)
             }
+        }
+    }
+    
+    func getRoom(userId: String, year: Int32, month: Int32) async -> Result<[UserFurnitureModel],AFError >{
+        let parameters: [String: Any] = [
+            "user_id": userId,
+            "year": year,
+            "month": month
+        ]
+        return await withCheckedContinuation {
+            continuation in AF.request(API_URL + "/room", parameters:parameters)
+                .responseDecodable(of: [UserFurnitureModel].self, decoder:decoder) {
+                    response in
+                    continuation.resume(returning: response.result)
+                }
         }
     }
 }
