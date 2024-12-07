@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CalendarView: View {
-    @StateObject private var viewModel = CalendarViewModel()
+    @ObservedObject var viewModel: CalendarViewModel
 
     var body: some View {
         VStack(spacing: 20) {

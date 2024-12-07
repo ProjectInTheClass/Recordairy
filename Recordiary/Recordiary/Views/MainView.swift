@@ -9,6 +9,7 @@ import SwiftUI
 import UIKit
 
 struct MainView: View {
+    @StateObject private var calendarViewModel = CalendarViewModel()
     // 기본 선택 탭 설정을 위한 State 변수
     @State private var selectedTab = 1  // 마이홈 탭을 기본값으로 설정
 
@@ -39,7 +40,7 @@ struct MainView: View {
         TabView(selection: $selectedTab) {
             // 캘린더 탭
             NavigationView {
-                CalendarView()
+                CalendarView(viewModel: calendarViewModel)
                     .navigationTitle("캘린더")
                     .navigationBarTitleDisplayMode(.inline)
             }
@@ -51,7 +52,7 @@ struct MainView: View {
 
             // 마이홈 탭 (기본 탭)
             NavigationView {
-                MyHomeView()
+                MyHomeView(calendarViewModel: calendarViewModel)
                     .navigationTitle("마이홈")
                     .navigationBarTitleDisplayMode(.inline)
             }

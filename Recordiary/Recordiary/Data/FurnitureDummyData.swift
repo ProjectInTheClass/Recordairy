@@ -53,17 +53,17 @@ let furnitureDummyData = [
 ]
 
 let diaryDummyData: [DiaryEntry] = [
-    DiaryEntry(
-        user_id: 1,
-        created_at: Date(), // 오늘 날짜
-        local_date: dateFormatter.string(from: Date()), // Medium 스타일로 포맷팅된 날짜
-        emotion: .happiness,
-        audio_link: URL(string: "https://example.com/audio1.mp3")!,
-        keyWord: "행복",
-        transcribedText: "오늘은 정말 행복한 하루였다.",
-        is_private: true,
-        connectedFurniture: furnitureDummyData[0]
-    ),
+//    DiaryEntry(
+//        user_id: 1,
+//        created_at: Date(), // 오늘 날짜
+//        local_date: dateFormatter.string(from: Date()), // Medium 스타일로 포맷팅된 날짜
+//        emotion: .happiness,
+//        audio_link: URL(string: "https://example.com/audio1.mp3")!,
+//        keyWord: "행복",
+//        transcribedText: "오늘은 정말 행복한 하루였다.",
+//        is_private: true,
+//        connectedFurniture: furnitureDummyData[0]
+//    ),
     DiaryEntry(
         user_id: 2,
         created_at: Calendar.current.date(byAdding: .day, value: -1, to: Date())!, // 어제
@@ -100,18 +100,18 @@ let diaryDummyData: [DiaryEntry] = [
 ]
 
 let diaryConnectedFurnitureDummyData: [DiaryConnectedFurniture] = [
-    DiaryConnectedFurniture(
-        furniture: furnitureDummyData[0], // 벽지
-        diary: diaryDummyData[0],
-        created_at: Calendar.current.date(byAdding: .hour, value: -1, to: Date())!, // 1시간 전
-        is_set: true,
-        is_vaild: true,
-        position: (x: 1, y: 1),
-        direction: 1
-    ),
+//    DiaryConnectedFurniture(
+//        furniture: furnitureDummyData[0], // 벽지
+//        diary: diaryDummyData[0],
+//        created_at: Calendar.current.date(byAdding: .hour, value: -1, to: Date())!, // 1시간 전
+//        is_set: true,
+//        is_vaild: true,
+//        position: (x: 1, y: 1),
+//        direction: 1
+//    ),
     DiaryConnectedFurniture(
         furniture: furnitureDummyData[1], // 카펫
-        diary: diaryDummyData[1],
+        diary: diaryDummyData[0],
         created_at: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!, // 3시간 전
         is_set: false,
         is_vaild: true,
@@ -120,7 +120,7 @@ let diaryConnectedFurnitureDummyData: [DiaryConnectedFurniture] = [
     ),
     DiaryConnectedFurniture(
         furniture: furnitureDummyData[2], // 소파
-        diary: diaryDummyData[2],
+        diary: diaryDummyData[1],
         created_at: Calendar.current.date(byAdding: .day, value: -1, to: Date())!, // 하루 전
         is_set: true,
         is_vaild: false,
@@ -129,7 +129,7 @@ let diaryConnectedFurnitureDummyData: [DiaryConnectedFurniture] = [
     ),
     DiaryConnectedFurniture(
         furniture: furnitureDummyData[4], // 꽃병
-        diary: diaryDummyData[3],
+        diary: diaryDummyData[2],
         created_at: Calendar.current.date(byAdding: .day, value: -2, to: Date())!, // 2일 전
         is_set: true,
         is_vaild: true,
