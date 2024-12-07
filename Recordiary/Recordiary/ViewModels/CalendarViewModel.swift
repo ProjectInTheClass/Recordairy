@@ -17,6 +17,10 @@ class CalendarViewModel: ObservableObject {
     var filteredEntries: [DiaryEntry] {
         entries.filter { Calendar.current.isDate($0.created_at, equalTo: currentMonth, toGranularity: .month) }
     }
+    
+    func addDiaryEntry(_ diary: DiaryEntry) {
+        entries.append(diary)
+    }
 
     // 날짜별 색상 결정
     func colorForDate(_ date: Date) -> Color {

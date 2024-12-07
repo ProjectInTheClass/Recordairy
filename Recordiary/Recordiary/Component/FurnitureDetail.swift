@@ -8,13 +8,12 @@
 import SwiftUI
 
 struct FurnitureDetailContent: View {
-    let detailedFurniture: DiaryConnectedFurniture // 가구 정보
-    @State private var isPlaying = false // 재생 상태 저장
+    let detailedFurniture: DiaryConnectedFurniture
+    @StateObject private var playbackViewModel = AudioPlaybackViewModel()
 
     var body: some View {
-        ScrollView { // 스크롤 가능한 영역
-            VStack(alignment: .leading, spacing: 16) { // 전체 왼쪽 정렬
-                // 가구 이미지와 정보
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
                 HStack(spacing: 16) {
                     RoundedRectangle(cornerRadius: 21)
                         .fill(Color(hex: "#E0E0E0"))
@@ -38,67 +37,46 @@ struct FurnitureDetailContent: View {
                     Spacer()
 
                     // 재생 버튼
-                    Button(action: {
-                        isPlaying.toggle() // 재생 상태 토글
-                    }) {
-                        ZStack {
-                            Circle() // 동그란 버튼
-                                .fill(Color(hex: "#6DAFCF"))
-                                .frame(width: 56, height: 56)
-                            Image(systemName: isPlaying ? "pause.fill" : "play.fill") // 상태에 따라 아이콘 변경
-                                .font(.system(size: 20))
-                                .foregroundColor(.white)
-                        }
-                    }
+                    let audioURL = detailedFurniture.diary.audio_link
+                    ReusablePlayButton(viewModel: playbackViewModel, audioURL: audioURL)
                 }
 
-                // 섹션
                 SectionView(title: "감정 추출 결과", content: detailedFurniture.diary.emotion.rawValue, hasContentBox: false, contentBoxStyle: .highlighted)
                 SectionView(title: "키워드 요약", content: detailedFurniture.diary.keyWord, hasContentBox: true, contentBoxStyle: .regular)
                 SectionView(title: "텍스트", content: detailedFurniture.diary.transcribedText, hasContentBox: true, contentBoxStyle: .regular)
             }
-            .padding(16) // 모달 내 여백 추가
+            .padding(16)
         }
     }
 }
 
+
 struct DiaryDetailContent: View {
-    let detailedDiary: DiaryEntry // 가구 정보
-    @State private var isPlaying = false // 재생 상태 저장
+    let detailedDiary: DiaryEntry
+    @StateObject private var playbackViewModel = AudioPlaybackViewModel()
 
     var body: some View {
-        ScrollView { // 스크롤 가능한 영역
-            VStack(alignment: .leading, spacing: 16) { // 전체 왼쪽 정렬
-                // 가구 이미지와 정보
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
                 HStack(spacing: 16) {
                     Text(detailedDiary.local_date)
                         .font(.system(size: 18, weight: .semibold))
 
                     Spacer()
-                    Button(action: {
-                        isPlaying.toggle() // 재생 상태 토글
-                    }) {
-                        ZStack {
-                            Circle() // 동그란 버튼
-                                .fill(Color(hex: "#6DAFCF"))
-                                .frame(width: 56, height: 56)
-                            Image(systemName: isPlaying ? "pause.fill" : "play.fill") // 상태에 따라 아이콘 변경
-                                .font(.system(size: 20))
-                                .foregroundColor(.white)
-                        }
-                    }
+
+                    // 재생 버튼
+                    let audioURL = detailedDiary.audio_link
+                    ReusablePlayButton(viewModel: playbackViewModel, audioURL: audioURL)
                 }
 
-                // 섹션
                 SectionView(title: "감정 추출 결과", content: detailedDiary.emotion.rawValue, hasContentBox: false, contentBoxStyle: .highlighted)
                 SectionView(title: "키워드 요약", content: detailedDiary.keyWord, hasContentBox: true, contentBoxStyle: .regular)
                 SectionView(title: "텍스트", content: detailedDiary.transcribedText, hasContentBox: true, contentBoxStyle: .regular)
             }
-            .padding(16) // 모달 내 여백 추가
+            .padding(16)
         }
     }
 }
-
 
 struct SectionView: View {
     let title: String
@@ -177,10 +155,27 @@ struct SectionView: View {
     }
 }
 
+struct ReusablePlayButton: View {
+    @ObservedObject var viewModel: AudioPlaybackViewModel
+    let audioURL: URL
 
-func formatDate(_ date: Date) -> String {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .medium
-    formatter.locale = Locale(identifier: "ko_KR")
-    return formatter.string(from: date)
+    var body: some View {
+        Button(action: {
+            if viewModel.isPlaying {
+                viewModel.stopAudio()
+            } else {
+                viewModel.playAudio(from: audioURL)
+            }
+        }) {
+            ZStack {
+                Circle()
+                    .fill(Color(hex: "#6DAFCF"))
+                    .frame(width: 56, height: 56)
+                Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(.white)
+            }
+        }
+    }
 }
+

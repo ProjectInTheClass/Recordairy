@@ -15,24 +15,25 @@ enum FilterMode {
 class LibraryViewModel: ObservableObject {
     @Published var isLibrarySheetPresented: Bool = false // 모달 상태
     @Published var searchText: String = "" // 검색 텍스트
-    @Published var isRecording: Bool = false // 녹음 상태
     @Published var filterMode: FilterMode = .all // 필터 모드
 
     // 전체 가구 데이터
     private var allFurniture: [Furniture] = furnitureDummyData
 
+    var ownedFurnitures: [Furniture] {
+        allFurniture.filter { $0.quantity > 0 }
+    }
+
     // 필터링된 가구 목록
     var filteredItems: [Furniture] {
-        // 필터 모드에 따른 기본 데이터 설정
         let baseItems: [Furniture]
         switch filterMode {
         case .all:
             baseItems = allFurniture
         case .unowned:
-            baseItems = allFurniture.filter { $0.quantity == 0 } // 미보유 가구 필터링
+            baseItems = allFurniture.filter { $0.quantity == 0 }
         }
 
-        // 검색 텍스트 필터링 적용
         if searchText.isEmpty {
             return baseItems
         } else {
@@ -50,8 +51,21 @@ class LibraryViewModel: ObservableObject {
         item.quantity
     }
 
-    // 녹음 상태 토글
-    func toggleRecording() {
-        isRecording.toggle()
+    func decreaseFurnitureQuantity(for furniture: Furniture) -> Bool {
+        guard let index = allFurniture.firstIndex(where: { $0.id == furniture.id }) else {
+            return false // 가구를 찾을 수 없으면 실패
+        }
+
+        if allFurniture[index].quantity > 0 {
+            allFurniture[index].quantity -= 1
+            return true // 성공적으로 수량 감소
+        }
+
+        return false // 수량이 0이어서 감소 불가
+    }
+    
+    func increaseFurnitureQuantity(for furniture: Furniture) {
+        guard let index = allFurniture.firstIndex(where: { $0.id == furniture.id }) else { return }
+        allFurniture[index].quantity += 1
     }
 }

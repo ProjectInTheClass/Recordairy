@@ -8,21 +8,25 @@
 import SwiftUI
 
 struct MyHomeView: View {
-    @StateObject private var libraryViewModel = LibraryViewModel() // LibraryViewModel 사용
-    @StateObject private var storageViewModel = StorageViewModel() // StorageViewModel 추가
-    @State private var isLibrarySheetPresented = false // 모달 시트 상태
-    @State private var isStorageSheetPresented = false // 보관함 모달 상태
+    @StateObject private var myHomeViewModel = MyHomeViewModel()
+    @StateObject private var libraryViewModel = LibraryViewModel()
+    @StateObject private var storageViewModel = StorageViewModel()
+    @ObservedObject var calendarViewModel: CalendarViewModel
+    @State private var isLibrarySheetPresented = false
+    @State private var isStorageSheetPresented = false
 
-    // 상태 변수
-    @State private var showReaction = false // Reaction 표시 여부
-    @State private var showRectangle = false // 사각형 표시 여부
-    @State private var isPlaying = false // 재생 상태 저장
-
+    // 추가된 상태 변수
+    @State private var showReaction = false
+    @State private var showRectangle = false
+    @State private var showSecondRectangle = false
+    @State private var isRecordingProcessActive = false
+    @State private var selectedFurnitureIndex: Int = 0 //캐러셀 선택시
+    
     var body: some View {
         ZStack {
-            Color(hex: "#FFF8E1").ignoresSafeArea() // 배경색
+            Color(hex: "#FFF8E1").ignoresSafeArea()
 
-            // 우측 상단 버튼들
+            // 우측 상단에 수직으로 배치된 버튼들
             VStack(spacing: 16) {
                 Button(action: { isLibrarySheetPresented = true }) {
                     Image(systemName: "cart")
@@ -32,6 +36,7 @@ struct MyHomeView: View {
                         .cornerRadius(21)
                         .shadow(color: Color(hex: "#6DAFCF"), radius: 0, x: 0, y: 4)
                 }
+                .disabled(isRecordingProcessActive)
                 .sheet(isPresented: $isLibrarySheetPresented) {
                     CustomModal {
                         LibraryModalContent(isPresented: $isLibrarySheetPresented, viewModel: libraryViewModel)
@@ -46,9 +51,10 @@ struct MyHomeView: View {
                         .cornerRadius(21)
                         .shadow(color: Color(hex: "#6DAFCF"), radius: 0, x: 0, y: 4)
                 }
+                .disabled(isRecordingProcessActive)
                 .sheet(isPresented: $isStorageSheetPresented) {
                     CustomModal {
-                        StorageModalContent(isPresented: $isStorageSheetPresented, viewModel: storageViewModel)
+                        StorageModalContent(isPresented: $isStorageSheetPresented, viewModel: storageViewModel, libraryViewModel: libraryViewModel)
                     }
                 }
             }
@@ -60,124 +66,168 @@ struct MyHomeView: View {
             VStack {
                 Spacer()
 
+                // Reaction 또는 사각형 UI
                 if showRectangle {
-                    rectangleView // 사각형 뷰
+                    if showSecondRectangle {
+                        SecondRectangleView(
+                            libraryViewModel: libraryViewModel,
+                            selectedFurnitureIndex: $selectedFurnitureIndex,
+                            onBack: handleBackButtonTap,
+                            onPlacement: handlePlacement,
+                            onStore: handleStore
+                        )
+                    } else {
+                        FirstRectangleView(
+                            isPlaying: $myHomeViewModel.isPlaying,
+                            currentDiary: $myHomeViewModel.currentDiary,
+                            onNext: handleNextButtonTap,
+                            onPlayPause: myHomeViewModel.playOrPauseRecording
+                        )
+                    }
                 } else if showReaction {
                     Image("radiobutton-reaction")
                         .resizable()
                         .frame(width: 328, height: 114)
-                        .offset(y: -25) // 버튼 위로 25픽셀
+                        .offset(y: -25)
                         .transition(.opacity)
                 }
 
-                // 녹음 버튼
-                Button(action: handleRadioButtonTap) {
-                    Image(
-                        libraryViewModel.isRecording ? "radiobutton-recording" : "radiobutton-enabled"
-                    )
-                    .resizable()
-                    .frame(width: 100, height: 100)
+                // 녹음 버튼과 취소 버튼
+                HStack(spacing: 16) {
+                    Button(action: handleRadioButtonTap) {
+                        Image(buttonImageName)
+                            .resizable()
+                            .frame(width: 100, height: 100)
+                    }
+                    .disabled(showRectangle && showSecondRectangle)
+
+                    if isRecordingProcessActive {
+                        Button(action: handleCancelTap) {
+                            Text("취소")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(width: 80, height: 44)
+                                .background(Color(hex: "#FF6F61"))
+                                .cornerRadius(12)
+                        }
+                        .transition(.opacity) // 부드러운 전환
+                    }
                 }
                 .padding(.bottom, 24)
             }
         }
     }
 
-    // 사각형 뷰
-    private var rectangleView: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // 사각형 내부 콘텐츠
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    HStack {
-                        // 제목 박스
-                        VStack(alignment: .leading) {
-                            Text("음성 듣기")
-                                .font(.system(size: 18, weight: .semibold))
-                                .foregroundColor(Color(hex: "#6DAFCF"))
-                                .frame(maxWidth: .infinity, alignment: .leading) // 왼쪽 상단 정렬
-                        }
-                        .frame(height: 30) // 제목 박스 높이
-                        .background(
-                            Rectangle()
-                                .fill(Color.clear) // 투명 배경
-                                .frame(height: 30) // 구분선 높이
-                                .overlay(
-                                    Rectangle()
-                                        .fill(Color(hex: "#6DAFCF")) // 구분선 색상
-                                        .frame(height: 0.33),
-                                    alignment: .bottom // 하단에만 구분선 추가
-                                )
-                        )
-                        Spacer()
-                        Button(action: handleNextButtonTap) {
-                            HStack(spacing: 4) {
-                                Text("다음")
-                                    .font(.system(size: 16, weight: .semibold))
-                                Image(systemName: "arrow.right")
-                                    .font(.system(size: 16, weight: .semibold))
-                            }
-                            .foregroundColor(Color(hex: "#999999"))
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(Color(hex: "#FFFDF7"))
-                            .cornerRadius(12)
-                        }
-                    }
-                    .padding(.trailing, 16)
-                    .padding(.top, 16)
-                    ZStack {
-                        Button(action: { isPlaying.toggle() }) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color(hex: "#6DAFCF"))
-                                    .frame(width: 56, height: 56)
-                                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(.white)
-                            }
-                        }
-                    }
-                    SectionView(title: "감정 추출 결과", content: "행복", hasContentBox: false, contentBoxStyle: .highlighted)
-                    SectionView(title: "키워드 요약", content: "행복, 즐거움, 만족", hasContentBox: true, contentBoxStyle: .regular)
-                    SectionView(title: "텍스트", content: "오늘은 정말 즐거운 하루였습니다.", hasContentBox: true, contentBoxStyle: .regular)
-                }
-                .padding(16)
-            }
+    // 녹음 버튼 이미지 결정
+    private var buttonImageName: String {
+        if showRectangle && showSecondRectangle {
+            return "radiobutton-disabled"
+        } else if myHomeViewModel.isRecording {
+            return "radiobutton-recording"
+        } else {
+            return "radiobutton-enabled"
         }
-        .background(
-            RoundedRectangle(cornerRadius: 21)
-                .fill(Color(hex: "#FFFDF7"))
-                .shadow(color: .black.opacity(0.1), radius: 4, x: 2, y: 2)
-        )
-        .frame(width: 327, height: 381)
-        .offset(y: -25)
-        .transition(.opacity)
     }
 
     // 녹음 버튼 동작
     private func handleRadioButtonTap() {
         withAnimation {
-            if showRectangle {
+            if showRectangle && !showSecondRectangle {
                 showRectangle = false
                 showReaction = true
             } else if showReaction {
                 showReaction = false
                 showRectangle = true
+                isRecordingProcessActive = true
             } else {
                 showReaction = true
+                isRecordingProcessActive = true
             }
         }
-        libraryViewModel.toggleRecording()
+        myHomeViewModel.toggleRecording()
     }
 
     // "다음" 버튼 동작
     private func handleNextButtonTap() {
         withAnimation {
-            showRectangle = false
-            showReaction = false
+            showSecondRectangle = true
         }
-        libraryViewModel.isRecording = false // 녹음 종료
+    }
+
+    // "이전" 버튼 동작
+    private func handleBackButtonTap() {
+        withAnimation {
+            showSecondRectangle = false
+        }
+    }
+
+    private func handlePlacement(furniture: Furniture) {
+        // 가구와 연결된 DiaryConnectedFurniture 생성
+        connectDiaryToFurniture(selectedFurniture: furniture, isSet: true)
+
+        resetState()
+    }
+
+
+    private func handleStore(furniture: Furniture) {
+        // 보관 동작: is_set = false, 보관함에 추가
+        connectDiaryToFurniture(selectedFurniture: furniture, isSet: false)
+
+        resetState() // 초기화
+    }
+
+    // 취소 버튼 동작
+    private func handleCancelTap() {
+        resetState()
+    }
+    
+    private func connectDiaryToFurniture(selectedFurniture: Furniture, isSet: Bool) {
+        guard var diary = myHomeViewModel.currentDiary else {
+            print("Error: currentDiary is nil.")
+            return
+        }
+
+        diary.connectedFurniture = selectedFurniture
+        calendarViewModel.addDiaryEntry(diary) // 캘린더 모델 업데이트
+
+        if libraryViewModel.decreaseFurnitureQuantity(for: selectedFurniture) {
+            if isSet {
+                print("Furniture \(selectedFurniture.display_name) is placed.")
+            } else {
+                storageViewModel.addItem(createDiaryConnectedFurniture(furniture: selectedFurniture, isSet: isSet))
+            }
+        } else {
+            print("Error: Unable to decrease furniture quantity. Check inventory.")
+        }
+    }
+    
+    private func createDiaryConnectedFurniture(furniture: Furniture, isSet: Bool) -> DiaryConnectedFurniture {
+        guard let diary = myHomeViewModel.currentDiary else {
+            fatalError("Diary cannot be nil when creating a connected furniture entry.")
+        }
+
+        return DiaryConnectedFurniture(
+            furniture: furniture,
+            diary: diary,
+            created_at: Date(),
+            is_set: isSet,
+            is_vaild: true,
+            position: nil,
+            direction: nil
+        )
+    }
+
+    // 초기화 함수
+    private func resetState() {
+        withAnimation {
+            showReaction = false
+            showRectangle = false
+            showSecondRectangle = false
+            isRecordingProcessActive = false
+            myHomeViewModel.isPlaying = false
+        }
+        myHomeViewModel.isRecording = false
     }
 }
 
@@ -292,19 +342,19 @@ struct LibraryModalContent: View {
 }
 
 struct StorageModalContent: View {
-    @Binding var isPresented: Bool // 모달 상태 바인딩
-    @ObservedObject var viewModel: StorageViewModel // 부모 뷰에서 전달된 ViewModel
-    @State private var showAlert = false // 경고창 표시 여부
-    @State private var itemToDelete: DiaryConnectedFurniture? // 삭제할 가구
+    @Binding var isPresented: Bool
+    @ObservedObject var viewModel: StorageViewModel
+    @ObservedObject var libraryViewModel: LibraryViewModel
+    @State private var showAlert = false
+    @State private var itemToDelete: DiaryConnectedFurniture?
 
     var body: some View {
         VStack(spacing: 16) {
             // 상단 버튼
             HStack {
                 if !viewModel.showDetails {
-                    // 닫기 버튼
                     Button(action: {
-                        isPresented = false // 모달 닫기
+                        isPresented = false
                     }) {
                         ZStack {
                             Circle()
@@ -322,21 +372,18 @@ struct StorageModalContent: View {
 
             // 콘텐츠
             if viewModel.showDetails, let furniture = viewModel.selectedFurniture {
-                // 가구 상세 정보
                 StorageFurnitureDetailView(
                     furniture: furniture,
-                    onBack: { viewModel.backToList() } // 리스트로 돌아가기
+                    onBack: { viewModel.backToList() }
                 )
             } else {
-                // 가구 리스트
                 ScrollView {
                     VStack(spacing: 16) {
                         ForEach(viewModel.items) { item in
                             HStack(spacing: 16) {
                                 Button(action: {
-                                    viewModel.selectFurniture(item) // 가구 선택
+                                    viewModel.selectFurniture(item)
                                 }) {
-                                    // 아이템 이미지 및 정보
                                     HStack(spacing: 16) {
                                         RoundedRectangle(cornerRadius: 21)
                                             .fill(Color(hex: "#E0E0E0"))
@@ -350,10 +397,10 @@ struct StorageModalContent: View {
                                             )
 
                                         VStack(alignment: .leading, spacing: 4) {
-                                            Text(item.furniture.display_name) // 가구 이름
+                                            Text(item.furniture.display_name)
                                                 .font(.system(size: 15, weight: .semibold))
                                                 .foregroundColor(.black)
-                                            Text(item.diary.local_date) // 일기 작성 날짜
+                                            Text(item.diary.local_date)
                                                 .font(.system(size: 14, weight: .medium))
                                                 .foregroundColor(.gray)
                                         }
@@ -362,10 +409,12 @@ struct StorageModalContent: View {
                                     }
                                 }
 
-                                // 우측 추가 및 삭제 버튼
+                                // 추가 및 삭제 버튼
                                 HStack(spacing: 8) {
                                     Button(action: {
-                                        // 추가 버튼: 현재 동작 없음
+                                        itemToDelete = item
+                                        viewModel.updateIsSetToTrue(item)
+                                        itemToDelete = nil
                                     }) {
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 21)
@@ -378,7 +427,6 @@ struct StorageModalContent: View {
                                     }
 
                                     Button(action: {
-                                        // 삭제 버튼 동작
                                         itemToDelete = item
                                         showAlert = true
                                     }) {
@@ -394,7 +442,7 @@ struct StorageModalContent: View {
                                 }
                             }
                             .padding()
-                            .background(Color.white) // 아이템 배경
+                            .background(Color.white)
                             .cornerRadius(21)
                             .frame(height: 88)
                         }
@@ -406,9 +454,10 @@ struct StorageModalContent: View {
         .alert(isPresented: $showAlert) {
             Alert(
                 title: Text("\(itemToDelete?.furniture.display_name ?? "가구")를 삭제하시겠습니까?"),
-                message: Text("삭제된 가구는 라이브러리에 추가되며,\n음성은 달력 탭에서 확인할 수 있습니다."),
+                message: Text("삭제된 가구는 라이브러리에 추가됩니다."),
                 primaryButton: .destructive(Text("삭제"), action: {
                     if let item = itemToDelete {
+                        libraryViewModel.increaseFurnitureQuantity(for: item.furniture) // 수량 증가
                         viewModel.deleteItem(item) // 삭제
                         itemToDelete = nil // 초기화
                     }
