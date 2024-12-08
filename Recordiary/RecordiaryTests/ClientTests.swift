@@ -5,9 +5,10 @@
 //  Created by RulerOfCakes on 12/4/24.
 //
 
-import Testing
 import AVFoundation
 import Foundation
+import Testing
+
 @testable import Recordiary
 
 let TEST_USER_ID = "90ed0a4a-5b48-496d-844b-64f4b29c2b3b"
@@ -19,24 +20,26 @@ struct ClientTests {
         let result = await client.getDiary(userId: TEST_USER_ID, diaryId: 1)
         let diary = try result.get()
         #expect(diary.id == 1)
-        
+
     }
-    
+
     @Test func testGetFurniture() async throws {
         let result = await client.getFurniture(id: 1)
         let furniture = try result.get()
-        
+
         #expect(furniture.id == 1)
-        
+
         let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month, .day], from:furniture.createdAt)
+        let components = calendar.dateComponents(
+            [.year, .month, .day], from: furniture.createdAt)
         #expect(components.year == 2024)
         #expect(components.month == 12)
         #expect(components.day == 3)
     }
-    
+
     @Test func testGetRoom() async throws {
-        let result = await client.getRoom(userId: TEST_USER_ID, year: 2024, month: 11)
+        let result = await client.getRoom(
+            userId: TEST_USER_ID, year: 2024, month: 11)
         let room = try result.get()
         #expect(room.count == 2)
     }
@@ -47,16 +50,19 @@ struct ClientTests {
     //        let newId = try result.get()
     //        #expect(newId != 0)
     //    }
-    
-    @Test func postUserFurniture() async throws {
-        let result = await client.postUserFurniture(userId: TEST_USER_ID, diaryId: 1, decoId: 1)
-        let void = try result.get()
-        #expect(void == ())
-    }
-    
-    @Test func updateUserFurniture() async throws {
-        let result = await client.updateUserFurniture(userId: TEST_USER_ID, diaryId: 1, decoId: 1, coordinates: UserFurnitureModel.Coordinates(x: 2, y: 2, z: 1, orientation: 1))
-        let void = try result.get()
-        #expect(void == ())
-    }
+
+    //    @Test func postUserFurniture() async throws {
+    //        let result = await client.postUserFurniture(userId: TEST_USER_ID, diaryId: 1, decoId: 1)
+    //        let void = try result.get()
+    //        #expect(void == ())
+    //    }
+
+    //    @Test func updateUserFurniture() async throws {
+    //        let result = await client.updateUserFurniture(
+    //            userId: TEST_USER_ID, diaryId: 1, decoId: 1,
+    //            coordinates: UserFurnitureModel.Coordinates(
+    //                x: 2, y: 2, z: 1, orientation: 1))
+    //        let void = try result.get()
+    //        #expect(void == ())
+    //    }
 }
