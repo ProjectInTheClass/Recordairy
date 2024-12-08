@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B983FD302CFFF24E00CE5FDA /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = B983FD2F2CFFF24E00CE5FDA /* Alamofire */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		39499EF12CD0962B00E571EA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B983FD302CFFF24E00CE5FDA /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = Recordiary;
 			packageProductDependencies = (
+				B983FD2F2CFFF24E00CE5FDA /* Alamofire */,
 			);
 			productName = Recordiary;
 			productReference = 39499EDF2CD0962700E571EA /* Recordiary.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 39499ED62CD0962700E571EA;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B983FD2E2CFFF24E00CE5FDA /* XCRemoteSwiftPackageReference "Alamofire" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 39499EE02CD0962700E571EA /* Products */;
 			projectDirPath = "";
@@ -583,6 +592,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B983FD2E2CFFF24E00CE5FDA /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B983FD2F2CFFF24E00CE5FDA /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B983FD2E2CFFF24E00CE5FDA /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 39499ED72CD0962700E571EA /* Project object */;
 }

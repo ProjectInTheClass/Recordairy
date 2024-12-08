@@ -75,7 +75,7 @@ pub struct CreateDecoParams {
 pub struct CreateDecoResponse;
 impl IntoResponse for CreateDecoResponse {
     fn into_response(self) -> axum::response::Response {
-        (StatusCode::OK, "").into_response()
+        (StatusCode::OK, "OK").into_response()
     }
 }
 
@@ -120,7 +120,7 @@ pub struct UpdateRoomResponse;
 
 impl IntoResponse for UpdateRoomResponse {
     fn into_response(self) -> axum::response::Response {
-        (StatusCode::OK, "").into_response()
+        (StatusCode::OK, "OK").into_response()
     }
 }
 
