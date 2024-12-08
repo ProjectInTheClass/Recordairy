@@ -47,7 +47,7 @@ struct UserFurnitureModel: Decodable {
     let isPlaced: Bool
     let coordinates: Coordinates?
 
-    struct Coordinates: Decodable {
+    struct Coordinates: Decodable, Encodable {
         let x: Int
         let y: Int
         let z: Int

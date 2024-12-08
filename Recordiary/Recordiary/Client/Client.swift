@@ -8,7 +8,12 @@
 import Alamofire
 import Foundation
 
+// let API_URL = "https://localhost:10000"
 let API_URL = "https://recordiary.onrender.com"
+
+enum APIError: Error {
+    case responseError(String)
+}
 
 struct APIClient {
     // TODO: Credentials
@@ -33,18 +38,24 @@ struct APIClient {
         }
     }
     
-    func postDiary(userId: String, isPrivate: Bool, audioFile: Data) async -> Result<Int64, AFError>{
+    func postDiary(userId: String, isPrivate: Bool, audioFile: Data) async -> Result<Int64, Error>{
+        let is_private = if isPrivate {"true"}else {"false"}
         return await withCheckedContinuation {
             continuation in
             AF.upload(
                 multipartFormData: { multipartFormData in
-                    multipartFormData.append(userId.data(using: .utf8)!, withName: "user_id")
-                    let is_private = if isPrivate {"true"}else {"false"}
-                    multipartFormData.append(is_private.data(using:.utf8)!,withName:"is_private")
-                    // Add the audio file data
                     multipartFormData.append(audioFile, withName: "audio_file", fileName: "audio_file", mimeType: "audio/mpeg")
-                }, to: API_URL + "/diary").responseDecodable(of: Int64.self) { response in
-                    continuation.resume(returning: response.result)
+                }, to: API_URL + "/diary?user_id=\(userId)&is_private=\(is_private)").responseString { response in
+                    switch response.result {
+                    case .success(let responseString):
+                        if let intValue = Int64(responseString) {
+                            continuation.resume(returning: .success(intValue))
+                        } else {
+                            continuation.resume(returning: .failure(APIError.responseError(responseString)))
+                        }
+                    case .failure(let error):
+                        continuation.resume(returning: .failure(error))
+                    }
                 }
         }
     }
@@ -82,6 +93,50 @@ struct APIClient {
                 .responseDecodable(of: [UserFurnitureModel].self, decoder:decoder) {
                     response in
                     continuation.resume(returning: response.result)
+                }
+        }
+    }
+    
+    // Call this when the user chooses a new furniture from their diary
+    func postUserFurniture(userId: String, diaryId: Int32,decoId: Int32) async -> Result<Void,Error>{
+        return await withCheckedContinuation {
+            continuation in AF.request(API_URL + "/room?user_id=\(userId)&diary_id=\(diaryId)&deco_id=\(decoId)", method: .post).responseString {
+                response in
+                switch response.result {
+                case .success(let responseString):
+                    if responseString == "OK" {
+                        continuation.resume(returning: .success(()))
+                    } else {
+                        continuation.resume(returning: .failure(APIError.responseError(responseString)))
+                    }
+                case .failure(let error):
+                    continuation.resume(returning: .failure(error))
+                }
+            }
+        }
+    }
+    
+    func updateUserFurniture(userId:String, diaryId: Int32, decoId: Int32, coordinates: UserFurnitureModel.Coordinates?) async -> Result<Void, Error> {
+        return await withCheckedContinuation {
+            continuation in AF.request(API_URL + "/room?user_id=\(userId)&diary_id=\(diaryId)&deco_id=\(decoId)", method: .put){
+                request in
+                if let body = coordinates {
+                    request.httpBody = try? JSONEncoder().encode(body) // Encode the body if it exists
+                    request.setValue("application/json", forHTTPHeaderField: "Content-Type") // Set Content-Type header
+                }
+            }
+                .responseString{
+                    response in
+                    switch response.result {
+                    case .success(let responseString):
+                        if responseString == "OK" {
+                            continuation.resume(returning: .success(()))
+                        } else {
+                            continuation.resume(returning: .failure(APIError.responseError(responseString)))
+                        }
+                    case .failure(let error):
+                        continuation.resume(returning: .failure(error))
+                    }
                 }
         }
     }
