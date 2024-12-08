@@ -18,14 +18,14 @@ struct SocialView: View {
 
                 VStack(alignment: .leading, spacing: geometry.size.height * 0.02) {
                     SectionHeader(title: "내 프로필", geometry: geometry)
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: 21)
                         .fill(Color.white)
                         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                         .overlay(profileSection(geometry: geometry))
                         .padding(.horizontal, geometry.size.width * 0.05)
 
                     SectionHeader(title: "코드로 친구 추가", geometry: geometry)
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: 21)
                         .fill(Color.white)
                         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                         .overlay(addFriendSection(geometry: geometry))
@@ -33,7 +33,7 @@ struct SocialView: View {
 
                     SectionHeader(title: "친구 리스트", geometry: geometry)
                     ForEach(friends, id: \.self) { friend in
-                        RoundedRectangle(cornerRadius: 12)
+                        RoundedRectangle(cornerRadius: 21)
                             .fill(Color.white)
                             .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
                             .overlay(friendRow(friend: friend, geometry: geometry))
@@ -45,22 +45,41 @@ struct SocialView: View {
             .navigationTitle("소셜")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $isProfileEditModalPresented) {
-                ProfileEditModal(isPresented: $isProfileEditModalPresented)
+                GeometryReader { geometry in
+                    CustomModal {
+                        ProfileEditModal(isPresented: $isProfileEditModalPresented)
+                    }
+                    .presentationDetents([.fraction(detentHeight(for: geometry))])
+                }
             }
             .sheet(isPresented: $isGuestBookModalPresented) {
-                GuestBookModal(isPresented: $isGuestBookModalPresented)
+                GeometryReader { geometry in
+                    CustomModal {
+                        GuestBookModal(isPresented: $isGuestBookModalPresented)
+                    }
+                    .presentationDetents([.fraction(detentHeight(for: geometry))])
+                }
             }
+
         }
     }
+    
+    private func detentHeight(for geometry: GeometryProxy) -> CGFloat {
+        let safeAreaTop = geometry.safeAreaInsets.top
+        let totalHeight = geometry.size.height
+        let navigationBarHeight: CGFloat = 44 // 네비게이션바 기본 높이
+        return (totalHeight - (safeAreaTop + navigationBarHeight)) / totalHeight
+    }
+
 
     private func profileSection(geometry: GeometryProxy) -> some View {
         HStack(spacing: geometry.size.width * 0.04) {
             Circle()
                 .fill(Color(hex: "#E0E0E0"))
-                .frame(width: geometry.size.width * 0.16, height: geometry.size.width * 0.16)
+                .frame(width: 56, height: 56)
                 .overlay(
                     Image(systemName: "person.fill")
-                        .font(.system(size: geometry.size.width * 0.08))
+                        .font(.system(size: 24))
                         .foregroundColor(.gray)
                 )
 
@@ -71,11 +90,11 @@ struct SocialView: View {
             Spacer()
 
             Button(action: { isProfileEditModalPresented = true }) {
-                CircleButton(iconName: "gearshape.fill", geometry: geometry)
+                CircleButton(iconName: "gearshape.fill")
             }
 
             Button(action: { isGuestBookModalPresented = true }) {
-                CircleButton(iconName: "envelope.fill", geometry: geometry)
+                CircleButton(iconName: "envelope.fill")
             }
         }
         .padding()
@@ -86,12 +105,11 @@ struct SocialView: View {
             TextField("코드를 입력하세요", text: .constant(""))
                 .padding()
                 .background(Color(hex: "#F9F9F9"))
-                .cornerRadius(8)
+                .cornerRadius(21)
                 .font(.body)
-                .frame(height: geometry.size.height * 0.05)
 
             Button(action: { /* 친구 추가 액션 */ }) {
-                CircleButton(iconName: "magnifyingglass", geometry: geometry)
+                CircleButton(iconName: "magnifyingglass")
             }
         }
         .padding()
@@ -101,10 +119,10 @@ struct SocialView: View {
         HStack(spacing: geometry.size.width * 0.04) {
             Circle()
                 .fill(Color(hex: "#E0E0E0"))
-                .frame(width: geometry.size.width * 0.12, height: geometry.size.width * 0.12)
+                .frame(width: 56, height: 56)
                 .overlay(
                     Image(systemName: "person.fill")
-                        .font(.system(size: geometry.size.width * 0.06))
+                        .font(.system(size: 24))
                         .foregroundColor(.gray)
                 )
 
@@ -115,7 +133,7 @@ struct SocialView: View {
             Spacer()
 
             Button(action: { /* 친구 방으로 이동 */ }) {
-                CircleButton(iconName: "arrow.right", geometry: geometry)
+                CircleButton(iconName: "arrow.right")
             }
         }
         .padding()
@@ -137,21 +155,21 @@ private struct SectionHeader: View {
 
 private struct CircleButton: View {
     let iconName: String
-    let geometry: GeometryProxy
 
     var body: some View {
         ZStack {
             Circle()
                 .fill(Color(hex: "#6DAFCF"))
-                .frame(width: geometry.size.width * 0.12, height: geometry.size.width * 0.12)
+                .frame(width: 56, height: 56)
             Image(systemName: iconName)
                 .resizable()
-                .frame(width: geometry.size.width * 0.06, height: geometry.size.width * 0.06)
+                .frame(width: 24, height: 24)
                 .foregroundColor(.white)
         }
     }
 }
 
+// 방명록 모달
 struct GuestBookModal: View {
     @Binding var isPresented: Bool
 
@@ -162,68 +180,67 @@ struct GuestBookModal: View {
     ]
 
     var body: some View {
-        GeometryReader { geometry in
-            VStack(spacing: geometry.size.height * 0.02) {
-                // 닫기 버튼
-                HStack {
-                    Button(action: { isPresented = false }) {
-                        Circle()
-                            .fill(Color(hex: "#E0E0E0"))
-                            .frame(width: geometry.size.width * 0.1)
-                            .overlay(
-                                Image(systemName: "xmark")
-                                    .foregroundColor(.white)
-                            )
-                    }
-                    Spacer()
+        VStack(spacing: 16) {
+            HStack {
+                Button(action: { isPresented = false }) {
+                    Circle()
+                        .fill(Color(hex: "#E0E0E0"))
+                        .frame(width: 56, height: 56)
+                        .overlay(
+                            Image(systemName: "xmark")
+                                .font(.system(size: 24))
+                                .foregroundColor(.white)
+                        )
                 }
-                .padding()
+                Spacer()
+            }
+            .padding()
 
-                ScrollView {
-                    VStack(spacing: geometry.size.height * 0.02) {
-                        ForEach(guestBookEntries) { entry in
-                            HStack(spacing: geometry.size.width * 0.04) {
-                                Circle()
-                                    .fill(Color(hex: "#E0E0E0"))
-                                    .frame(width: geometry.size.width * 0.12)
-                                    .overlay(
-                                        Image(systemName: "person.fill")
-                                            .foregroundColor(.gray)
-                                            .font(.system(size: geometry.size.width * 0.06))
-                                    )
-
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(entry.message)
-                                        .font(.subheadline)
-                                        .foregroundColor(.black)
-                                    Text(entry.name)
-                                        .font(.footnote)
+            ScrollView {
+                VStack(spacing: 16) {
+                    ForEach(guestBookEntries) { entry in
+                        HStack(spacing: 16) {
+                            Circle()
+                                .fill(Color(hex: "#E0E0E0"))
+                                .frame(width: 56, height: 56)
+                                .overlay(
+                                    Image(systemName: "person.fill")
+                                        .font(.system(size: 24))
                                         .foregroundColor(.gray)
-                                }
+                                )
 
-                                Spacer()
-
-                                Button(action: { /* 재생 */ }) {
-                                    CircleButton(iconName: "play.fill", geometry: geometry)
-                                }
-
-                                Button(action: { /* 답장 */ }) {
-                                    CircleButton(iconName: "arrowshape.turn.up.right.fill", geometry: geometry)
-                                }
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(entry.message)
+                                    .font(.subheadline)
+                                    .foregroundColor(.black)
+                                Text(entry.name)
+                                    .font(.footnote)
+                                    .foregroundColor(.gray)
                             }
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(12)
+
+                            Spacer()
+
+                            Button(action: { /* 재생 */ }) {
+                                CircleButton(iconName: "play.fill")
+                            }
+
+                            Button(action: { /* 답장 */ }) {
+                                CircleButton(iconName: "arrowshape.turn.up.right.fill")
+                            }
                         }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(21)
                     }
-                    .padding()
                 }
             }
-            .background(Color(hex: "#FFFDF7").ignoresSafeArea())
+            .padding()
         }
+        .background(Color(hex: "#FFFDF7").ignoresSafeArea())
+        .presentationDetents([.large])
+        .presentationDragIndicator(.hidden)
     }
 }
-
 
 struct GuestBookEntry: Identifiable {
     let id = UUID()
@@ -231,9 +248,11 @@ struct GuestBookEntry: Identifiable {
     let message: String
 }
 
+
 struct ProfileEditModal: View {
     @Binding var isPresented: Bool
 
+    // 프로필 정보
     @State private var userName: String = UserDefaults.standard.string(forKey: "UserName") ?? "사용자 이름"
     @State private var profileImage: UIImage? = {
         if let imageData = UserDefaults.standard.data(forKey: "ProfileImage") {
@@ -242,12 +261,16 @@ struct ProfileEditModal: View {
         return nil
     }()
     @State private var isImagePickerPresented: Bool = false
+
+    // 일기 공개 여부
     @State private var isDiaryPublic: Bool = UserDefaults.standard.bool(forKey: "IsDiaryPublic")
+
+    // 친구 코드 & 계정 정보
     @State private var friendCode: String = UserDefaults.standard.string(forKey: "FriendCode") ?? "1234-5678"
     @State private var accountInfo: String = UserDefaults.standard.string(forKey: "AccountInfo") ?? "연결된 계정 정보"
 
     var body: some View {
-        GeometryReader { geometry in
+        CustomModal {
             VStack(spacing: 16) {
                 // 닫기 버튼
                 HStack {
@@ -262,21 +285,18 @@ struct ProfileEditModal: View {
                     }
                     Spacer()
                 }
-                .padding()
+                .padding(.horizontal)
 
-                // 프로필 정보 섹션
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("기본 정보")
-                        .font(.headline)
-                        .foregroundColor(Color(hex: "#6DAFCF"))
-
+                // 기본 정보 섹션
+                Section(title: "기본 정보") {
                     HStack(spacing: 16) {
+                        // 프로필 사진
                         Button(action: { isImagePickerPresented = true }) {
                             if let profileImage = profileImage {
                                 Image(uiImage: profileImage)
                                     .resizable()
                                     .scaledToFill()
-                                    .frame(width: geometry.size.width * 0.2, height: geometry.size.width * 0.2)
+                                    .frame(width: 80, height: 80)
                                     .clipShape(Circle())
                                     .overlay(
                                         Circle()
@@ -285,7 +305,7 @@ struct ProfileEditModal: View {
                             } else {
                                 Circle()
                                     .fill(Color(hex: "#E0E0E0"))
-                                    .frame(width: geometry.size.width * 0.2, height: geometry.size.width * 0.2)
+                                    .frame(width: 80, height: 80)
                                     .overlay(
                                         Image(systemName: "person.fill")
                                             .foregroundColor(.gray)
@@ -293,75 +313,73 @@ struct ProfileEditModal: View {
                             }
                         }
 
-                        TextField("이름", text: $userName)
-                            .padding()
-                            .background(Color(hex: "#F9F9F9"))
-                            .cornerRadius(8)
-                    }
+                        VStack(alignment: .leading, spacing: 8) {
+                            // 이름 입력
+                            TextField("이름", text: $userName)
+                                .padding(8)
+                                .background(Color(hex: "#F9F9F9"))
+                                .cornerRadius(8)
 
-                    Button(action: saveProfile) {
-                        Text("수정 완료")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color(hex: "#6DAFCF"))
-                            .cornerRadius(8)
+                            // 수정 완료 버튼
+                            Button(action: saveProfile) {
+                                Text("수정 완료")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color(hex: "#6DAFCF"))
+                                    .cornerRadius(8)
+                            }
+                        }
                     }
                 }
-                .padding(.horizontal)
 
-                // 일기 공개 여부
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("일기 공개 여부 설정")
-                        .font(.headline)
-                        .foregroundColor(Color(hex: "#6DAFCF"))
-
+                // 일기 공개 여부 섹션
+                Section(title: "일기 공개 여부 설정") {
                     Toggle("음성 일기 친구에게 공개", isOn: $isDiaryPublic)
                         .toggleStyle(SwitchToggleStyle(tint: Color(hex: "#6DAFCF")))
                         .onChange(of: isDiaryPublic) { newValue in
                             UserDefaults.standard.set(newValue, forKey: "IsDiaryPublic")
                         }
                 }
-                .padding(.horizontal)
 
-                // 친구 코드
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("내 친구 코드")
-                        .font(.headline)
-                        .foregroundColor(Color(hex: "#6DAFCF"))
-
+                // 내 친구 코드 섹션
+                Section(title: "내 친구 코드") {
                     Text(friendCode)
                         .font(.body)
                         .padding()
                         .background(Color(hex: "#F9F9F9"))
                         .cornerRadius(8)
-                        .disabled(true)
-                    Spacer()
                 }
-                .padding(.horizontal)
 
-                // 계정 정보
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("계정")
-                        .font(.headline)
-                        .foregroundColor(Color(hex: "#6DAFCF"))
-
+                // 계정 정보 섹션
+                Section(title: "계정") {
                     Text(accountInfo)
                         .font(.body)
                         .padding()
                         .background(Color(hex: "#F9F9F9"))
                         .cornerRadius(8)
-                        .disabled(true)
-                    Spacer()
                 }
-                .padding(.horizontal)
 
                 Spacer()
+                
+                // 로그아웃 버튼
+                                    Button(action: {
+                                        handleLogout()
+                                    }) {
+                                        Text("로그아웃")
+                                            .font(.headline)
+                                            .foregroundColor(.red)
+                                            .frame(maxWidth: .infinity)
+                                            .padding()
+                                            .background(Color(hex: "#FFF0F0"))
+                                            .cornerRadius(8)
+                                    }
+                                    .padding(.horizontal)
+                                    .padding(.bottom, 16)
+                
             }
-            .background(Color(hex: "#FFFDF7").ignoresSafeArea())
-            .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.hidden)
+            .padding()
             .sheet(isPresented: $isImagePickerPresented) {
                 ImagePicker(image: $profileImage) { selectedImage in
                     saveProfileImage(selectedImage)
@@ -370,11 +388,13 @@ struct ProfileEditModal: View {
         }
     }
 
+    // 프로필 저장 함수
     private func saveProfile() {
         UserDefaults.standard.set(userName, forKey: "UserName")
         print("사용자 이름 저장됨: \(userName)")
     }
 
+    // 프로필 이미지 저장 함수
     private func saveProfileImage(_ image: UIImage) {
         if let imageData = image.jpegData(compressionQuality: 0.8) {
             UserDefaults.standard.set(imageData, forKey: "ProfileImage")
@@ -382,7 +402,39 @@ struct ProfileEditModal: View {
             print("프로필 이미지 저장됨")
         }
     }
+    
+    private func handleLogout() {
+            print("로그아웃 버튼 클릭됨")
+            UserDefaults.standard.removeObject(forKey: "UserName")
+            UserDefaults.standard.removeObject(forKey: "ProfileImage")
+            UserDefaults.standard.removeObject(forKey: "FriendCode")
+            UserDefaults.standard.removeObject(forKey: "AccountInfo")
+            UserDefaults.standard.removeObject(forKey: "IsDiaryPublic")
+        }
 }
+
+struct Section<Content: View>: View {
+    let title: String
+    let content: Content
+
+    init(title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(Color(hex: "#6DAFCF"))
+
+            content
+        }
+        .padding(.horizontal)
+    }
+}
+
+
 
 /*import SwiftUI
 
