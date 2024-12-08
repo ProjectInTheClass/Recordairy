@@ -21,7 +21,7 @@ struct MyHomeView: View {
     var body: some View {
         ZStack {
             Color(hex: "#FFF8E1").ignoresSafeArea() // 배경색
-            
+            /*
             // 테스트용 버튼
                     VStack {
                         Spacer()
@@ -53,6 +53,7 @@ struct MyHomeView: View {
                         
                         Spacer()
                     }
+             */
 
             // 우측 상단 버튼들
             VStack(spacing: 16) {
