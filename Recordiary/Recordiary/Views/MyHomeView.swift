@@ -21,39 +21,6 @@ struct MyHomeView: View {
     var body: some View {
         ZStack {
             Color(hex: "#FFF8E1").ignoresSafeArea() // 배경색
-            /*
-            // 테스트용 버튼
-                    VStack {
-                        Spacer()
-                        
-                        VStack(spacing: 20) {
-                            NavigationLink(destination: LoginView()) {
-                                Text("로그인 페이지로 이동")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color(hex: "#6DAFCF"))
-                                    .cornerRadius(8)
-                            }
-                            .padding(.horizontal)
-
-                            NavigationLink(destination: RegisterView()) {
-                                Text("회원가입 페이지로 이동")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color(hex: "#6DAFCF"))
-                                    .cornerRadius(8)
-                            }
-                            .padding(.horizontal)
-                        }
-                        .padding(.bottom, 50) // 화면 하단 여백
-                        
-                        Spacer()
-                    }
-             */
 
             // 우측 상단 버튼들
             VStack(spacing: 16) {
