@@ -49,11 +49,11 @@ struct SocialView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isProfileEditModalPresented) {
             ProfileEditModal(isPresented: $isProfileEditModalPresented)
-                .presentationDetents([.large]) // 중형 & 대형 디텐트
+                .presentationDetents([.large]) //  대형 디텐트
         }
         .sheet(isPresented: $isGuestBookModalPresented) {
             GuestBookModal(isPresented: $isGuestBookModalPresented)
-                .presentationDetents([.large]) // 중형 & 대형 디텐트
+                .presentationDetents([.large]) // 대형 디텐트
         }
     }
     
@@ -301,39 +301,37 @@ struct ProfileEditModal: View {
                     }
                     Spacer()
                 }
-                Spacer()
-            }
-            .padding(.horizontal)
-            
-            // ScrollView로 스크롤 가능하도록 변경
-            ScrollView {
-                VStack(spacing: 16) {
-                    // 기본 정보 섹션
-                    profileSection
-                    
-                    // 일기 공개 여부 섹션
-                    settingSection(title: "일기 공개 여부 설정") {
-                        ZStack{
-                            RoundedRectangle(cornerRadius: 21)
-                                .fill(.white)
-                                .frame(height: 63)
-                            Toggle("음성 일기 친구에게 공개", isOn: $isDiaryPublic)
-                                .toggleStyle(SwitchToggleStyle(tint: Color(hex: "#6DAFCF")))
-                                .onChange(of: isDiaryPublic) { newValue in
-                                    UserDefaults.standard.set(newValue, forKey: "IsDiaryPublic")
-                                }
-                                .padding(.horizontal)
+                .padding(.horizontal)
+                
+                // ScrollView로 스크롤 가능하도록 변경
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // 기본 정보 섹션
+                        profileSection
+                        
+                        // 일기 공개 여부 섹션
+                        settingSection(title: "일기 공개 여부 설정") {
+                            ZStack{
+                                RoundedRectangle(cornerRadius: 21)
+                                    .fill(.white)
+                                    .frame(height: 63)
+                                Toggle("음성 일기 친구에게 공개", isOn: $isDiaryPublic)
+                                    .toggleStyle(SwitchToggleStyle(tint: Color(hex: "#6DAFCF")))
+                                    .onChange(of: isDiaryPublic) { newValue in
+                                        UserDefaults.standard.set(newValue, forKey: "IsDiaryPublic")
+                                    }
+                                    .padding(.horizontal)
+                            }
                         }
-                    }
-                    
-                    // 내 친구 코드 섹션
-                    settingSection(title: "내 친구 코드") {
-                        Text(friendCode)
-                            .font(.body)
-                            .padding()
-                            .background(.white)
-                            .cornerRadius(8)
-
+                        
+                        // 내 친구 코드 섹션
+                        settingSection(title: "내 친구 코드") {
+                            Text(friendCode)
+                                .font(.body)
+                                .padding()
+                                .background(.white)
+                                .cornerRadius(8)
+                            
                         }
                         
                         
@@ -359,7 +357,8 @@ struct ProfileEditModal: View {
                     .padding(.horizontal)
                 }
             }
-        }}
+        }
+    }
     
     // 프로필 저장 함수
     private func saveProfile() {
@@ -454,6 +453,7 @@ struct ProfileEditModal: View {
         }
     }
 }
+
 
 // ImagePicker: 이미지 선택기 구현
 struct ImagePicker: UIViewControllerRepresentable {
