@@ -48,14 +48,12 @@ struct SocialView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isProfileEditModalPresented) {
-            CustomModalLarge {
-                ProfileEditModal(isPresented: $isProfileEditModalPresented)
-            }
+            ProfileEditModal(isPresented: $isProfileEditModalPresented)
+                .presentationDetents([.large]) // 중형 & 대형 디텐트
         }
         .sheet(isPresented: $isGuestBookModalPresented) {
-            CustomModalLarge {
-                GuestBookModal(isPresented: $isGuestBookModalPresented)
-            }
+            GuestBookModal(isPresented: $isGuestBookModalPresented)
+                .presentationDetents([.large]) // 중형 & 대형 디텐트
         }
     }
     
@@ -101,7 +99,7 @@ struct SocialView: View {
         }
         .padding()
     }
-
+    
     private func friendRow(friend: String, index: Int) -> some View {
         HStack(spacing: 16) {
             Circle()
@@ -193,60 +191,63 @@ struct GuestBookModal: View {
     ]
     
     var body: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Button(action: { isPresented = false }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(hex: "#E0E0E0"))
-                            .frame(width: 44, height: 44)
-                        Image(systemName: "xmark")
-                            .font(.system(size: 20))
-                            .foregroundColor(.white)
-                    }
-                }
-                Spacer()
-            }
-            .padding(.horizontal)
-            
-            ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(guestBookEntries) { entry in
-                        HStack(spacing: 16) {
+        CustomModal{
+            VStack(spacing: 16) {
+                HStack {
+                    Button(action: { isPresented = false }) {
+                        ZStack {
                             Circle()
                                 .fill(Color(hex: "#E0E0E0"))
-                                .frame(width: 56, height: 56)
-                                .overlay(
-                                    Image(systemName: "person.fill")
-                                        .font(.system(size: 24))
-                                        .foregroundColor(.gray)
-                                )
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(entry.message)
-                                    .font(.subheadline)
-                                    .foregroundColor(.black)
-                                Text(entry.name)
-                                    .font(.footnote)
-                                    .foregroundColor(.gray)
-                            }
-                            
-                            Spacer()
-                            
-                            Button(action: { /* 재생 */ }) {
-                                let audioURL = URL(string: "https://example.com/audio5.mp3")!
-                                ReusablePlayButton(viewModel: playbackViewModel, audioURL: audioURL)
-                            }
-                            
-                            Button(action: { /* 답장 */ }) {
-                                RectButton(iconName: "arrowshape.turn.up.right")
-                            }
+                                .frame(width: 44, height: 44)
+                            Image(systemName: "xmark")
+                                .font(.system(size: 20))
+                                .foregroundColor(.white)
                         }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(21)
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal)
+                
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(guestBookEntries) { entry in
+                            HStack(spacing: 16) {
+                                Circle()
+                                    .fill(Color(hex: "#E0E0E0"))
+                                    .frame(width: 56, height: 56)
+                                    .overlay(
+                                        Image(systemName: "person.fill")
+                                            .font(.system(size: 24))
+                                            .foregroundColor(.gray)
+                                    )
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(entry.message)
+                                        .font(.subheadline)
+                                        .foregroundColor(.black)
+                                    Text(entry.name)
+                                        .font(.footnote)
+                                        .foregroundColor(.gray)
+                                }
+                                
+                                Spacer()
+                                
+                                Button(action: { /* 재생 */ }) {
+                                    let audioURL = URL(string: "https://example.com/audio5.mp3")!
+                                    ReusablePlayButton(viewModel: playbackViewModel, audioURL: audioURL)
+                                }
+                                
+                                Button(action: { /* 답장 */ }) {
+                                    RectButton(iconName: "arrowshape.turn.up.right")
+                                }
+                            }
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(21)
+                        }
                     }
                 }
+                .padding()
             }
             .padding(.horizontal)
         }
@@ -284,18 +285,21 @@ struct ProfileEditModal: View {
     @State private var accountInfo: String = UserDefaults.standard.string(forKey: "AccountInfo") ?? "연결된 계정 정보"
     
     var body: some View {
-        VStack(spacing: 16) {
-            // 닫기 버튼
-            HStack {
-                Button(action: { isPresented = false }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(hex: "#E0E0E0"))
-                            .frame(width: 44, height: 44)
-                        Image(systemName: "xmark")
-                            .font(.system(size: 20))
-                            .foregroundColor(.white)
+        CustomModal{
+            VStack(spacing: 16) {
+                // 닫기 버튼
+                HStack {
+                    Button(action: { isPresented = false }) {
+                        ZStack {
+                            Circle()
+                                .fill(Color(hex: "#E0E0E0"))
+                                .frame(width: 44, height: 44)
+                            Image(systemName: "xmark")
+                                .font(.system(size: 20))
+                                .foregroundColor(.white)
+                        }
                     }
+                    Spacer()
                 }
                 Spacer()
             }
@@ -329,31 +333,33 @@ struct ProfileEditModal: View {
                             .padding()
                             .background(.white)
                             .cornerRadius(8)
+
+                        }
+                        
+                        
+                        // 계정 정보 섹션
+                        settingSection(title: "계정") {
+                            Text(accountInfo)
+                                .font(.body)
+                                .padding()
+                                .background(Color(hex: ".white"))
+                                .cornerRadius(8)
+                        }
                     }
-                    
-                    // 계정 정보 섹션
-                    settingSection(title: "계정") {
-                        Text(accountInfo)
-                            .font(.body)
+                    // 로그아웃 버튼
+                    Button(action: { showLogoutAlert = true }) {
+                        Text("로그아웃")
+                            .font(.headline)
+                            .foregroundColor(.red)
+                            .frame(maxWidth: .infinity)
                             .padding()
                             .background(.white)
                             .cornerRadius(8)
                     }
+                    .padding(.horizontal)
                 }
-                // 로그아웃 버튼
-                Button(action: { showLogoutAlert = true }) {
-                    Text("로그아웃")
-                        .font(.headline)
-                        .foregroundColor(.red)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(hex: "#FFF0F0"))
-                        .cornerRadius(8)
-                }
-                .padding(.horizontal)
             }
-        }
-    }
+        }}
     
     // 프로필 저장 함수
     private func saveProfile() {
