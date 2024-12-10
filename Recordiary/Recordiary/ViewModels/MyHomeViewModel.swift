@@ -9,6 +9,7 @@
 import Foundation
 
 class MyHomeViewModel: ObservableObject {
+    private let apiClient = APIClient()
     @Published var isRecording = false
     @Published var currentDiary: DiaryEntry? = nil // 생성 중인 일기 객체
     @Published var isPlaying = false // 재생 상태
@@ -24,10 +25,10 @@ class MyHomeViewModel: ObservableObject {
     }
 
     /// 녹음 시작 및 종료
-    func toggleRecording() {
+    func toggleRecording() async {
         if isRecording {
             if let audioURL = recordingManager.stopRecording() {
-                createDiary(with: audioURL)
+                await createDiary(with: audioURL)
             }
         } else {
             let success = recordingManager.startRecording()
@@ -48,8 +49,8 @@ class MyHomeViewModel: ObservableObject {
     }
 
     /// 녹음 파일로 일기 객체를 생성.
-    private func createDiary(with audioURL: URL) {
-        let newDiary = DiaryEntry(
+    private func createDiary(with audioURL: URL) async  {
+        var newDiary = DiaryEntry(
             id: UUID(),
             user_id: 1,
             created_at: Date(),
@@ -61,6 +62,22 @@ class MyHomeViewModel: ObservableObject {
             is_private: false,
             connectedFurniture: nil
         )
+        do {
+            let audioData = try Data(contentsOf: newDiary.audio_link)
+            let result = await apiClient.postDiary(userId: "90ed0a4a-5b48-496d-844b-64f4b29c2b3b", isPrivate: false, audioFile: audioData)
+            switch result {
+            case .success(let diaryId):
+                print("Diary uploaded successfully with ID: \(diaryId)")
+            case .failure(let error):
+                print("Failed to upload diary: \(error.localizedDescription)")
+            }
+        } catch {
+            print("Failed to load audio file: \(error.localizedDescription)")
+        }
+
+        //텍스트 업데이트
+        //감정 업데이트
+        
         currentDiary = newDiary
         print("새 일기 생성됨: \(newDiary)")
     }

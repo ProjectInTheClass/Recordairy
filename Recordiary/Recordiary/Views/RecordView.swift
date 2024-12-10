@@ -52,22 +52,16 @@ struct FirstRectangleView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         titleWithSeparator("키워드 요약")
-                        TextEditor(text: Binding(
-                            get: { diary.keyWord },
-                            set: { currentDiary?.keyWord = $0 }
-                        ))
-                        .frame(height: 80)
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 8).fill(Color.white))
+                        Text(diary.keyWord)
+                            .padding()
+                            .background(RoundedRectangle(cornerRadius: 8).fill(Color.white))
+                            .multilineTextAlignment(.leading)
 
                         titleWithSeparator("텍스트")
-                        TextEditor(text: Binding(
-                            get: { diary.transcribedText },
-                            set: { currentDiary?.transcribedText = $0 }
-                        ))
-                        .frame(height: 120)
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 8).fill(Color.white))
+                        Text(diary.transcribedText)
+                            .padding()
+                            .background(RoundedRectangle(cornerRadius: 8).fill(Color.white))
+                            .multilineTextAlignment(.leading)
                     }
                 }
                 .padding(16)
