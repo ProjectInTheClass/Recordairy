@@ -94,7 +94,11 @@ struct MyHomeView: View {
 
                 // 녹음 버튼과 취소 버튼
                 HStack(spacing: 16) {
-                    Button(action: handleRadioButtonTap) {
+                    Button(action: {
+                        Task {
+                            await handleRadioButtonTap()
+                        }
+                    }) {
                         Image(buttonImageName)
                             .resizable()
                             .frame(width: 100, height: 100)
@@ -131,7 +135,7 @@ struct MyHomeView: View {
     }
 
     // 녹음 버튼 동작
-    private func handleRadioButtonTap() {
+    private func handleRadioButtonTap() async {
         withAnimation {
             if showRectangle && !showSecondRectangle {
                 showRectangle = false
@@ -145,7 +149,7 @@ struct MyHomeView: View {
                 isRecordingProcessActive = true
             }
         }
-        myHomeViewModel.toggleRecording()
+        await myHomeViewModel.toggleRecording()
     }
 
     // "다음" 버튼 동작

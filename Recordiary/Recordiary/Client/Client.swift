@@ -52,7 +52,7 @@ struct APIClient {
                 multipartFormData: { multipartFormData in
                     multipartFormData.append(
                         audioFile, withName: "audio_file",
-                        fileName: "audio_file", mimeType: "audio/mpeg")
+                        fileName: "audio_file", mimeType: "audio/mp4")
                 },
                 to: API_URL
                     + "/diary?user_id=\(userId)&is_private=\(is_private)"

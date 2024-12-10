@@ -14,33 +14,37 @@ struct SocialView: View {
     var body: some View {
         ZStack {
             Color(hex: "#FFF8E1").ignoresSafeArea()
-            
-            VStack(alignment: .leading, spacing: 20) {
-                // 내 프로필 섹션
-                SectionHeader(title: "내 프로필")
-                RoundedRectangle(cornerRadius: 21)
-                    .fill(Color.white)
-                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-                    .overlay(profileSection())
-                
-                // 코드로 친구 추가 섹션
-                SectionHeader(title: "코드로 친구 추가")
-                RoundedRectangle(cornerRadius: 21)
-                    .fill(Color.white)
-                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-                    .overlay(addFriendSection())
-                
-                // 친구 리스트 섹션
-                SectionHeader(title: "친구 리스트")
-                ForEach(Array(viewModel.friends.enumerated()), id: \.offset) { index, friend in
+            ScrollView{
+                VStack(alignment: .leading, spacing: 20) {
+                    // 내 프로필 섹션
+                    SectionHeader(title: "내 프로필")
                     RoundedRectangle(cornerRadius: 21)
                         .fill(Color.white)
-                        .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
-                        .overlay(friendRow(friend: friend, index: index))
+                        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        .frame(height: 88) // 높이 지정
+                        .overlay(profileSection())
+                    
+                    // 코드로 친구 추가 섹션
+                    SectionHeader(title: "코드로 친구 추가")
+                    RoundedRectangle(cornerRadius: 21)
+                        .fill(Color.white)
+                        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        .frame(height: 88) // 높이 지정
+                        .overlay(addFriendSection())
+                    
+                    // 친구 리스트 섹션
+                    SectionHeader(title: "친구 리스트")
+                    ForEach(Array(viewModel.friends.enumerated()), id: \.offset) { index, friend in
+                        RoundedRectangle(cornerRadius: 21)
+                            .fill(Color.white)
+                            .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
+                            .frame(height: 88) // 높이 지정
+                            .overlay(friendRow(friend: friend, index: index))
+                    }
+                    Spacer()
                 }
-                Spacer()
+                .padding(16)
             }
-            .padding(16)
         }
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isProfileEditModalPresented) {
@@ -245,11 +249,11 @@ struct GuestBookModal: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "#FFFDF7").ignoresSafeArea())
-            .presentationDetents([.large])
-            .presentationDragIndicator(.hidden)
+            .padding(.horizontal)
         }
-    }}
+        .background(Color(hex: "#FFFDF7").ignoresSafeArea())
+    }
+}
 
 struct GuestBookEntry: Identifiable {
     let id = UUID()
@@ -297,38 +301,48 @@ struct ProfileEditModal: View {
                     }
                     Spacer()
                 }
-                .padding(.horizontal)
-                
-                // ScrollView로 스크롤 가능하도록 변경
-                ScrollView {
-                    VStack(spacing: 16) {
-                        // 기본 정보 섹션
-                        profileSection
-                        
-                        // 일기 공개 여부 섹션
-                        settingSection(title: "일기 공개 여부 설정") {
+                Spacer()
+            }
+            .padding(.horizontal)
+            
+            // ScrollView로 스크롤 가능하도록 변경
+            ScrollView {
+                VStack(spacing: 16) {
+                    // 기본 정보 섹션
+                    profileSection
+                    
+                    // 일기 공개 여부 섹션
+                    settingSection(title: "일기 공개 여부 설정") {
+                        ZStack{
+                            RoundedRectangle(cornerRadius: 21)
+                                .fill(.white)
+                                .frame(height: 63)
                             Toggle("음성 일기 친구에게 공개", isOn: $isDiaryPublic)
                                 .toggleStyle(SwitchToggleStyle(tint: Color(hex: "#6DAFCF")))
                                 .onChange(of: isDiaryPublic) { newValue in
                                     UserDefaults.standard.set(newValue, forKey: "IsDiaryPublic")
                                 }
+                                .padding(.horizontal)
+                        }
+                    }
+                    
+                    // 내 친구 코드 섹션
+                    settingSection(title: "내 친구 코드") {
+                        Text(friendCode)
+                            .font(.body)
+                            .padding()
+                            .background(.white)
+                            .cornerRadius(8)
+
                         }
                         
-                        // 내 친구 코드 섹션
-                        settingSection(title: "내 친구 코드") {
-                            Text(friendCode)
-                                .font(.body)
-                                .padding()
-                                .background(Color(hex: "#F9F9F9"))
-                                .cornerRadius(8)
-                        }
                         
                         // 계정 정보 섹션
                         settingSection(title: "계정") {
                             Text(accountInfo)
                                 .font(.body)
                                 .padding()
-                                .background(Color(hex: "#F9F9F9"))
+                                .background(Color(hex: ".white"))
                                 .cornerRadius(8)
                         }
                     }
@@ -339,7 +353,7 @@ struct ProfileEditModal: View {
                             .foregroundColor(.red)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color(hex: "#FFF0F0"))
+                            .background(.white)
                             .cornerRadius(8)
                     }
                     .padding(.horizontal)
@@ -373,15 +387,28 @@ struct ProfileEditModal: View {
     
     // 섹션 생성 공통 뷰
     private func settingSection<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.headline)
-                .padding(.bottom, 4)
+        VStack{
+            VStack(alignment: .leading, spacing: 8) {
+                Text(title)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(Color(hex: "#6DAFCF"))
+                    .frame(maxWidth: .infinity, alignment: .leading) // 왼쪽 상단 정렬
+            }
+            .frame(height: 30) // 제목 박스 높이
+            .background(
+                Rectangle()
+                    .fill(Color.clear) // 투명 배경
+                    .frame(height: 30) // 구분선 높이
+                    .overlay(
+                        Rectangle()
+                            .fill(Color(hex: "#2C3E50")) // 구분선 색상
+                            .frame(height: 0.33),
+                        alignment: .bottom // 하단에만 구분선 추가
+                    )
+            )
             content()
         }
-        .padding()
-        .background(Color(hex: "#FFFDF7"))
-        .cornerRadius(12)
+        .padding(.horizontal)
     }
     
     private var profileSection: some View {
