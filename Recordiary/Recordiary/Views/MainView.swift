@@ -7,7 +7,7 @@
 
 import SwiftUI
 import UIKit
-/*
+
 struct MainView: View {
     @StateObject private var calendarViewModel = CalendarViewModel()
     // 기본 선택 탭 설정을 위한 State 변수
@@ -76,7 +76,8 @@ struct MainView: View {
         
         
     }
-}*/
+}
+/* test
 struct MainView: View {
     @StateObject private var calendarViewModel = CalendarViewModel()
     @State private var selectedTab = 1  // 기본 탭 설정
@@ -179,3 +180,4 @@ struct MainView: View {
         }
     }
 }
+*/
