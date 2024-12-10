@@ -390,17 +390,17 @@ struct ProfileEditModal: View {
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 16)
-                // NavigationLink로 화면 전환 처리
-                NavigationLink(destination: LoginView(), isActive: $navigateToLogin) {
-                    EmptyView()
-                }
-                
             }
             .padding()
             .sheet(isPresented: $isImagePickerPresented) {
                 ImagePicker(image: $profileImage) { selectedImage in
                     saveProfileImage(selectedImage)
                 }
+                
+            }
+            .navigationDestination(isPresented: $navigateToLogin) {
+                LoginView() // LoginView로 이동
+                
             }
         }
     }

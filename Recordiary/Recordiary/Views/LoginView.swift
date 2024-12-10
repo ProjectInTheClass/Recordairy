@@ -80,8 +80,8 @@ struct LoginView: View {
                 }
                 .padding(.bottom, 8)
 
-                // MyHomeView로 돌아가는 버튼
-                NavigationLink(destination: MyHomeView()) {
+               /* // MyHomeView로 돌아가는 버튼
+                NavigationLink(destination: MyHomeView(calendarViewModel: <#T##CalendarViewModel#>)) {
                     Text("홈으로 돌아가기")
                         .font(.headline)
                         .foregroundColor(.white)
@@ -91,7 +91,7 @@ struct LoginView: View {
                         .cornerRadius(8)
                         .padding(.horizontal, 30)
                 }
-                .padding(.bottom, 24)
+                .padding(.bottom, 24)*/
             }
         }
     }
