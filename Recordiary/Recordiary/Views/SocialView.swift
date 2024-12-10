@@ -343,30 +343,6 @@ struct ProfileEditModal: View {
                         .cornerRadius(8)
                 }
                 .padding(.horizontal)
-                
-                // 로그아웃 확인 Alert
-                .alert(isPresented: $showLogoutAlert) {
-                    Alert(
-                        title: Text("로그아웃"),
-                        message: Text("정말 로그아웃하시겠습니까?"),
-                        primaryButton: .destructive(Text("로그아웃"), action: {
-                            handleLogout()
-                            navigateToLogin = true
-                        }),
-                        secondaryButton: .cancel(Text("취소"))
-                    )
-                }
-                
-                // NavigationLink로 화면 전환 처리
-                NavigationLink(destination: LoginView(), isActive: $navigateToLogin) {
-                    EmptyView()
-                }
-            }
-        }
-        .padding()
-        .sheet(isPresented: $isImagePickerPresented) {
-            ImagePicker(image: $profileImage) { selectedImage in
-                saveProfileImage(selectedImage)
             }
         }
     }

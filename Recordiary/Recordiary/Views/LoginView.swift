@@ -80,18 +80,18 @@ struct LoginView: View {
                 }
                 .padding(.bottom, 8)
 
-                // MyHomeView로 돌아가는 버튼
-//                NavigationLink(destination: MyHomeView()) {
-//                    Text("홈으로 돌아가기")
-//                        .font(.headline)
-//                        .foregroundColor(.white)
-//                        .frame(maxWidth: .infinity)
-//                        .padding()
-//                        .background(Color(hex: "#6DAFCF"))
-//                        .cornerRadius(8)
-//                        .padding(.horizontal, 30)
-//                }
-//                .padding(.bottom, 24)
+               /* // MyHomeView로 돌아가는 버튼
+                NavigationLink(destination: MyHomeView(calendarViewModel: <#T##CalendarViewModel#>)) {
+                    Text("홈으로 돌아가기")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color(hex: "#6DAFCF"))
+                        .cornerRadius(8)
+                        .padding(.horizontal, 30)
+                }
+                .padding(.bottom, 24)*/
             }
         }
     }
