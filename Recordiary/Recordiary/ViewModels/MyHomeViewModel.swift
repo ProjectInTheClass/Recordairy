@@ -8,8 +8,9 @@
 
 import Foundation
 
+let apiClient = APIClient()
+
 class MyHomeViewModel: ObservableObject {
-    private let apiClient = APIClient()
     @Published var isRecording = false
     @Published var currentDiary: DiaryEntry? = nil // 생성 중인 일기 객체
     @Published var isPlaying = false // 재생 상태

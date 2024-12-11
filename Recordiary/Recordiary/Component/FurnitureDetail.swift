@@ -27,7 +27,7 @@ struct FurnitureDetailContent: View {
                         )
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(detailedFurniture.furniture.name)
+                        Text(detailedFurniture.furniture.display_name)
                             .font(.system(size: 18, weight: .semibold))
                         Text(detailedFurniture.diary.local_date)
                             .font(.system(size: 16, weight: .medium))
