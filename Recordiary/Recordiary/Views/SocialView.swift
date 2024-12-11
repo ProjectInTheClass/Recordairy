@@ -10,6 +10,7 @@ struct SocialView: View {
     @State private var isProfileEditModalPresented = false
     @State private var isGuestBookModalPresented = false
     @StateObject private var viewModel = SocialViewModel()
+    @StateObject private var profile = Profile(userName: "사용자 이름") // 초기 값 설정
     
     var body: some View {
         ZStack {
@@ -48,7 +49,7 @@ struct SocialView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isProfileEditModalPresented) {
-            ProfileEditModal(isPresented: $isProfileEditModalPresented)
+            ProfileEditModal(isPresented: $isProfileEditModalPresented, profile: profile)
                 .presentationDetents([.large]) //  대형 디텐트
         }
         .sheet(isPresented: $isGuestBookModalPresented) {
@@ -59,16 +60,25 @@ struct SocialView: View {
     
     private func profileSection() -> some View {
         HStack(spacing: 16) {
-            Circle()
-                .fill(Color(hex: "#E0E0E0"))
-                .frame(width: 56, height: 56)
-                .overlay(
-                    Image(systemName: "person.fill")
-                        .font(.system(size: 24))
-                        .foregroundColor(.gray)
-                )
+            if let image = profile.profileImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 56, height: 56)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.gray, lineWidth: 1))
+            } else {
+                Circle()
+                    .fill(Color(hex: "#E0E0E0"))
+                    .frame(width: 56, height: 56)
+                    .overlay(
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(.gray)
+                    )
+            }
             
-            Text("사용자 이름")
+            Text(profile.userName)
                 .font(.headline)
                 .foregroundColor(.black)
             
@@ -241,13 +251,13 @@ struct GuestBookModal: View {
                                     RectButton(iconName: "arrowshape.turn.up.right")
                                 }
                             }
-                            .padding()
+                            .padding(.horizontal)
                             .background(Color.white)
                             .cornerRadius(21)
                         }
                     }
                 }
-                .padding()
+                .padding(.horizontal)
             }
             .padding(.horizontal)
         }
@@ -264,18 +274,22 @@ struct GuestBookEntry: Identifiable {
 
 struct ProfileEditModal: View {
     @Binding var isPresented: Bool
+    @ObservedObject var profile: Profile // 공유된 프로필 객체
+    
     @State private var navigateToLogin = false
     @State private var showLogoutAlert = false // 로그아웃 확인용
     
     // 프로필 정보
-    @State private var userName: String = UserDefaults.standard.string(forKey: "UserName") ?? "사용자 이름"
-    @State private var profileImage: UIImage? = {
-        if let imageData = UserDefaults.standard.data(forKey: "ProfileImage") {
-            return UIImage(data: imageData)
-        }
-        return nil
-    }()
+    @State private var newName: String
+    @State private var newProfileImage: UIImage?
     @State private var isImagePickerPresented = false
+    
+    init(isPresented: Binding<Bool>, profile: Profile) {
+        self._isPresented = isPresented
+        self.profile = profile
+        self._newName = State(initialValue: profile.userName)
+        self._newProfileImage = State(initialValue: profile.profileImage)
+    }
     
     // 일기 공개 여부
     @State private var isDiaryPublic: Bool = UserDefaults.standard.bool(forKey: "IsDiaryPublic")
@@ -340,7 +354,7 @@ struct ProfileEditModal: View {
                             Text(accountInfo)
                                 .font(.body)
                                 .padding()
-                                .background(Color(hex: ".white"))
+                                .background(.white)
                                 .cornerRadius(8)
                         }
                     }
@@ -357,22 +371,14 @@ struct ProfileEditModal: View {
                     .padding(.horizontal)
                 }
             }
+            
         }
     }
     
-    // 프로필 저장 함수
-    private func saveProfile() {
-        UserDefaults.standard.set(userName, forKey: "UserName")
-        print("사용자 이름 저장됨: \(userName)")
-    }
-    
-    // 프로필 이미지 저장 함수
-    private func saveProfileImage(_ image: UIImage) {
-        if let imageData = image.jpegData(compressionQuality: 0.8) {
-            UserDefaults.standard.set(imageData, forKey: "ProfileImage")
-            profileImage = image
-            print("프로필 이미지 저장됨")
-        }
+    private func saveChanges() {
+        profile.userName = newName
+        profile.profileImage = newProfileImage
+        isPresented = false
     }
     
     private func handleLogout() {
@@ -414,16 +420,12 @@ struct ProfileEditModal: View {
         settingSection(title: "기본 정보") {
             HStack(spacing: 16) {
                 Button(action: { isImagePickerPresented = true }) {
-                    if let profileImage = profileImage {
-                        Image(uiImage: profileImage)
+                    if let newProfileImage = newProfileImage {
+                        Image(uiImage: newProfileImage)
                             .resizable()
                             .scaledToFill()
                             .frame(width: 80, height: 80)
                             .clipShape(Circle())
-                            .overlay(
-                                Circle()
-                                    .stroke(Color(hex: "#6DAFCF"), lineWidth: 2)
-                            )
                     } else {
                         Circle()
                             .fill(Color(hex: "#E0E0E0"))
@@ -435,11 +437,11 @@ struct ProfileEditModal: View {
                     }
                 }
                 VStack(alignment: .leading, spacing: 8) {
-                    TextField("이름", text: $userName)
+                    TextField("이름", text: $newName)
                         .padding(8)
                         .background(Color(hex: "#F9F9F9"))
                         .cornerRadius(8)
-                    Button(action: saveProfile) {
+                    Button(action: saveChanges) {
                         Text("수정 완료")
                             .font(.headline)
                             .foregroundColor(.white)
@@ -449,6 +451,11 @@ struct ProfileEditModal: View {
                             .cornerRadius(8)
                     }
                 }
+            }
+        }
+        .sheet(isPresented: $isImagePickerPresented) {
+            ImagePicker(image: $newProfileImage) { image in
+                newProfileImage = image
             }
         }
     }
