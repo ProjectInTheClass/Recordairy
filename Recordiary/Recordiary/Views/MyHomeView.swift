@@ -25,6 +25,9 @@ struct MyHomeView: View {
     var body: some View {
         ZStack {
             Color(hex: "#FFF8E1").ignoresSafeArea()
+            
+            RoomView()
+                .offset(y: -40)
 
             // 우측 상단에 수직으로 배치된 버튼들
             VStack(spacing: 16) {
