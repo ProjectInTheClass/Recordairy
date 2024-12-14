@@ -64,7 +64,7 @@ pub async fn create_diary(
     Query(params): Query<CreateDiaryParams>,
     multipart: Multipart,
 ) -> axum::response::Result<String> {
-    let mut tx = get_pg_tx(pool).await?;
+    let mut tx = get_pg_tx(pool.clone()).await?;
     let result: anyhow::Result<_> = async {
         let (audio_bytes, _audio_metadata) = match parse_multipart(multipart).await {
             Ok(audio_data) => audio_data,
@@ -85,18 +85,36 @@ pub async fn create_diary(
         let audio_link = storage_client
             .upload_diary(audio_bytes.to_vec(), &audio_title)
             .await?;
+        update_diary(&mut tx, diary_id, Some(audio_link), None, None, None).await?;
 
-        let audio_transcription = openai_client.transcribe(&audio_title, &audio_bytes).await?;
+        // create a background subtask to transcribe the audio
+        tokio::spawn(async move {
+            let mut tx = get_pg_tx(pool).await.unwrap();
+            match openai_client.transcribe(&audio_title, &audio_bytes).await {
+                Ok(audio_transcription) => {
+                    if let Err(e) = update_diary(
+                        &mut tx,
+                        diary_id,
+                        None,
+                        None,
+                        Some(audio_transcription),
+                        None,
+                    )
+                    .await
+                    {
+                        tracing::error!("Failed to update diary with transcription: {}", e);
+                    }
+                }
+                Err(e) => {
+                    tracing::error!("Failed to transcribe audio: {}", e);
+                }
+            }
 
-        update_diary(
-            &mut tx,
-            diary_id,
-            Some(audio_link),
-            None,
-            Some(audio_transcription),
-            None,
-        )
-        .await?;
+            if let Err(e) = tx.commit().await {
+                tracing::error!("Failed to commit transaction: {}", e);
+            };
+        });
+
         Ok(diary_id)
     }
     .await;
