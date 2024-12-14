@@ -10,6 +10,7 @@ use uuid::Uuid;
 
 use crate::{
     db::diary::{insert_diary, update_diary, Diary},
+    openai::client::OpenAIClient,
     storage::client::SupabaseClient,
     utils::{get_diary_filename, parse_multipart::parse_multipart, sqlx::get_pg_tx},
     AppState,
@@ -56,6 +57,7 @@ pub struct CreateDiaryParams {
 #[debug_handler(state = AppState)]
 pub async fn create_diary(
     State(pool): State<PgPool>,
+    State(openai_client): State<OpenAIClient>,
     State(storage_client): State<SupabaseClient>,
     Query(params): Query<CreateDiaryParams>,
     multipart: Multipart,
@@ -77,14 +79,22 @@ pub async fn create_diary(
             ),
         )
         .await?;
+        let audio_title = get_diary_filename(params.user_id, diary_id);
         let audio_link = storage_client
-            .upload_diary(
-                audio_bytes.to_vec(),
-                get_diary_filename(params.user_id, diary_id),
-            )
+            .upload_diary(audio_bytes.to_vec(), &audio_title)
             .await?;
 
-        update_diary(&mut tx, diary_id, Some(audio_link), None, None).await?;
+        let audio_transcription = openai_client.transcribe(&audio_title, &audio_bytes)?;
+
+        update_diary(
+            &mut tx,
+            diary_id,
+            Some(audio_link),
+            Some(audio_transcription),
+            None,
+            None,
+        )
+        .await?;
         Ok(diary_id)
     }
     .await;

@@ -95,7 +95,7 @@ pub async fn create_deco(
         };
         // upload model to storage
         let url = storage_client
-            .upload_model(model_bytes.to_vec(), params.name.clone())
+            .upload_model(model_bytes.to_vec(), &params.name)
             .await?;
 
         let deco = crate::db::deco::create_deco(

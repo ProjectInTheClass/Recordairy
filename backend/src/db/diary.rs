@@ -11,6 +11,7 @@ pub struct Diary {
     user_id: Uuid,
     audio_link: Option<String>,
     summary: Option<String>,
+    transcription: Option<String>,
     is_private: bool,
 }
 
@@ -94,6 +95,7 @@ pub async fn update_diary(
     id: i64,
     audio_link: Option<String>,
     summary: Option<String>,
+    transcription: Option<String>,
     is_private: Option<bool>,
 ) -> anyhow::Result<()> {
     if audio_link.is_none() && summary.is_none() && is_private.is_none() {
@@ -109,6 +111,10 @@ pub async fn update_diary(
     if let Some(summary) = summary {
         separated.push_unseparated("summary = ");
         separated.push_bind(summary);
+    }
+    if let Some(transcription) = transcription {
+        separated.push_unseparated("transcription = ");
+        separated.push_bind(transcription);
     }
     if let Some(is_private) = is_private {
         separated.push_unseparated("is_private = ");
