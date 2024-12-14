@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::extract::FromRef;
 use db::conn::initialize_conn_pool;
 use openai::client::OpenAIClient;
@@ -13,7 +15,7 @@ pub mod utils;
 pub struct AppState {
     pool: sqlx::PgPool,
     storage_client: SupabaseClient,
-    openai_client: OpenAIClient,
+    openai_client: Arc<OpenAIClient>,
 }
 
 impl AppState {
@@ -26,7 +28,7 @@ impl AppState {
                 std::env::var("SUPABASE_AUDIO_BUCKET").unwrap(),
                 std::env::var("SUPABASE_MODEL_BUCKET").unwrap(),
             ),
-            openai_client: OpenAIClient::new(),
+            openai_client: Arc::new(OpenAIClient::new()),
         }
     }
 }
@@ -43,8 +45,8 @@ impl FromRef<AppState> for SupabaseClient {
     }
 }
 
-impl FromRef<AppState> for OpenAIClient {
-    fn from_ref(state: &AppState) -> OpenAIClient {
+impl FromRef<AppState> for Arc<OpenAIClient> {
+    fn from_ref(state: &AppState) -> Arc<OpenAIClient> {
         state.openai_client.clone()
     }
 }

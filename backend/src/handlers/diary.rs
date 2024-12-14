@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     debug_handler,
     extract::{Multipart, Query, State},
@@ -57,7 +59,7 @@ pub struct CreateDiaryParams {
 #[debug_handler(state = AppState)]
 pub async fn create_diary(
     State(pool): State<PgPool>,
-    State(openai_client): State<OpenAIClient>,
+    State(openai_client): State<Arc<OpenAIClient>>,
     State(storage_client): State<SupabaseClient>,
     Query(params): Query<CreateDiaryParams>,
     multipart: Multipart,
@@ -84,14 +86,14 @@ pub async fn create_diary(
             .upload_diary(audio_bytes.to_vec(), &audio_title)
             .await?;
 
-        let audio_transcription = openai_client.transcribe(&audio_title, &audio_bytes)?;
+        let audio_transcription = openai_client.transcribe(&audio_title, &audio_bytes).await?;
 
         update_diary(
             &mut tx,
             diary_id,
             Some(audio_link),
-            Some(audio_transcription),
             None,
+            Some(audio_transcription),
             None,
         )
         .await?;
