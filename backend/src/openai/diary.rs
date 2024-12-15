@@ -15,8 +15,18 @@ pub async fn summarize_diary(
     let mut tx = get_pg_tx(pool).await.unwrap();
 
     let summary = client.summarize(&transcription).await.unwrap();
-    // let emotion = client.sentiment(&transcription).await.unwrap();
-    let res = update_diary(&mut tx, diary_id, None, Some(summary), None, None).await;
+    let emotion = client.sentiment(&transcription).await.unwrap();
+    let res = update_diary(
+        &mut tx,
+        diary_id,
+        None,
+        Some(summary),
+        None,
+        Some(emotion),
+        None,
+    )
+    .await;
+
     let tx_res = match res {
         Ok(_) => tx.commit().await,
         Err(e) => {
@@ -24,6 +34,7 @@ pub async fn summarize_diary(
             tx.rollback().await
         }
     };
+
     if let Err(e) = tx_res {
         tracing::error!("Summarize tx error: {:?}", e);
     }

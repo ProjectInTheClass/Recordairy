@@ -86,7 +86,7 @@ impl OpenAIClient {
             .to_string())
     }
 
-    pub async fn sentiment(&self, content: &str) -> anyhow::Result<Emotion> {
+    pub async fn sentiment(&self, content: &str) -> anyhow::Result<String> {
         let base_prompt = "Analyze the sentiment of the following korean text. 
         Only respond with one of the following choices: anger, sadness, happiness, neutral.
         Target text: ";
@@ -122,13 +122,7 @@ impl OpenAIClient {
             .clone()
             .unwrap_or("neutral".to_string())
             .to_string();
-        let emotion = match raw_emotion.as_str() {
-            "anger" => Emotion::Anger,
-            "sadness" => Emotion::Sadness,
-            "happiness" => Emotion::Happiness,
-            _ => Emotion::Neutral,
-        };
-        Ok(emotion)
+        Ok(raw_emotion)
     }
 }
 

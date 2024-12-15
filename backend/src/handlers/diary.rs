@@ -85,7 +85,7 @@ pub async fn create_diary(
         let audio_link = storage_client
             .upload_diary(audio_bytes.to_vec(), &audio_title)
             .await?;
-        update_diary(&mut tx, diary_id, Some(audio_link), None, None, None).await?;
+        update_diary(&mut tx, diary_id, Some(audio_link), None, None, None, None).await?;
 
         // create a background subtask to transcribe the audio
         tokio::spawn(async move {
@@ -98,6 +98,7 @@ pub async fn create_diary(
                         None,
                         None,
                         Some(audio_transcription.clone()),
+                        None,
                         None,
                     )
                     .await

@@ -12,6 +12,7 @@ pub struct Diary {
     audio_link: Option<String>,
     summary: Option<String>,
     transcription: Option<String>,
+    emotion: Option<String>,
     is_private: bool,
 }
 
@@ -96,9 +97,14 @@ pub async fn update_diary(
     audio_link: Option<String>,
     summary: Option<String>,
     transcription: Option<String>,
+    emotion: Option<String>,
     is_private: Option<bool>,
 ) -> anyhow::Result<()> {
-    if audio_link.is_none() && summary.is_none() && transcription.is_none() && is_private.is_none()
+    if audio_link.is_none()
+        && summary.is_none()
+        && transcription.is_none()
+        && is_private.is_none()
+        && emotion.is_none()
     {
         return Ok(());
     }
@@ -129,6 +135,14 @@ pub async fn update_diary(
         }
         separated.push_unseparated("transcription = ");
         separated.push_bind_unseparated(transcription);
+        first = false;
+    }
+    if let Some(emotion) = emotion {
+        if !first {
+            separated.push_unseparated(", ");
+        }
+        separated.push_unseparated("emotion = ");
+        separated.push_bind_unseparated(emotion);
         first = false;
     }
     if let Some(is_private) = is_private {
