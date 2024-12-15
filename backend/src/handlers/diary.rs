@@ -12,7 +12,7 @@ use uuid::Uuid;
 
 use crate::{
     db::diary::{insert_diary, update_diary, Diary},
-    openai::client::OpenAIClient,
+    openai::{client::OpenAIClient, diary::summarize_diary},
     storage::client::SupabaseClient,
     utils::{get_diary_filename, parse_multipart::parse_multipart, sqlx::get_pg_tx},
     AppState,
@@ -89,7 +89,7 @@ pub async fn create_diary(
 
         // create a background subtask to transcribe the audio
         tokio::spawn(async move {
-            let mut tx = get_pg_tx(pool).await.unwrap();
+            let mut tx = get_pg_tx(pool.clone()).await.unwrap();
             match openai_client.transcribe(&audio_title, &audio_bytes).await {
                 Ok(audio_transcription) => {
                     if let Err(e) = update_diary(
@@ -97,22 +97,26 @@ pub async fn create_diary(
                         diary_id,
                         None,
                         None,
-                        Some(audio_transcription),
+                        Some(audio_transcription.clone()),
                         None,
                     )
                     .await
                     {
                         tracing::error!("Failed to update diary with transcription: {}", e);
+                    } else {
+                        if let Err(e) = tx.commit().await {
+                            tracing::error!("Failed to commit transaction: {}", e);
+                        }
+                        tokio::spawn(async move {
+                            summarize_diary(pool, openai_client, diary_id, audio_transcription)
+                                .await;
+                        });
                     }
                 }
                 Err(e) => {
                     tracing::error!("Failed to transcribe audio: {}", e);
                 }
             }
-
-            if let Err(e) = tx.commit().await {
-                tracing::error!("Failed to commit transaction: {}", e);
-            };
         });
 
         Ok(diary_id)

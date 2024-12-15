@@ -1,6 +1,16 @@
 use std::{fs::File, io::Write};
 
-use openai_api_rs::v1::audio::AudioTranscriptionRequest;
+use openai_api_rs::v1::{
+    audio::AudioTranscriptionRequest,
+    chat_completion::{ChatCompletionMessage, ChatCompletionRequest, Content, MessageRole},
+};
+
+pub enum Emotion {
+    Anger,
+    Sadness,
+    Happiness,
+    Neutral,
+}
 
 pub struct OpenAIClient {
     openai: openai_api_rs::v1::api::OpenAIClient,
@@ -35,11 +45,90 @@ impl OpenAIClient {
             temperature: None,
             language: Some("ko".to_string()),
         };
-        let resp = self.openai.audio_transcription(request).await;
-        match resp {
-            Ok(resp) => Ok(resp.text),
-            Err(e) => Err(anyhow::anyhow!("Failed to transcribe audio: {:?}", e)),
-        }
+        let resp = self.openai.audio_transcription(request).await?;
+        Ok(resp.text)
+    }
+
+    pub async fn summarize(&self, content: &str) -> anyhow::Result<String> {
+        let request = ChatCompletionRequest {
+            model: "gpt-3.5-turbo".to_string(),
+            messages: vec![ChatCompletionMessage {
+                role: MessageRole::system,
+                content: Content::Text(
+                    "Summarize the following text in korean: ".to_string() + content,
+                ),
+                name: None,
+                tool_call_id: None,
+                tool_calls: None,
+            }],
+            temperature: Some(0.0),
+            top_p: None,
+            n: None,
+            response_format: None,
+            stream: None,
+            stop: None,
+            max_tokens: Some(50),
+            presence_penalty: None,
+            frequency_penalty: None,
+            logit_bias: None,
+            user: None,
+            seed: None,
+            tools: None,
+            parallel_tool_calls: None,
+            tool_choice: None,
+        };
+        let resp = self.openai.chat_completion(request).await?;
+        Ok(resp.choices[0]
+            .message
+            .content
+            .clone()
+            .unwrap_or("".to_string())
+            .to_string())
+    }
+
+    pub async fn sentiment(&self, content: &str) -> anyhow::Result<Emotion> {
+        let base_prompt = "Analyze the sentiment of the following korean text. 
+        Only respond with one of the following choices: anger, sadness, happiness, neutral.
+        Target text: ";
+        let request = ChatCompletionRequest {
+            model: "gpt-3.5-turbo".to_string(),
+            messages: vec![ChatCompletionMessage {
+                role: MessageRole::system,
+                content: Content::Text(base_prompt.to_string() + content),
+                name: None,
+                tool_call_id: None,
+                tool_calls: None,
+            }],
+            temperature: Some(0.0),
+            top_p: None,
+            n: None,
+            response_format: None,
+            stream: None,
+            stop: None,
+            max_tokens: Some(50),
+            presence_penalty: None,
+            frequency_penalty: None,
+            logit_bias: None,
+            user: None,
+            seed: None,
+            tools: None,
+            parallel_tool_calls: None,
+            tool_choice: None,
+        };
+        let resp = self.openai.chat_completion(request).await?;
+        let raw_emotion = resp.choices[0]
+            .message
+            .content
+            .clone()
+            .unwrap_or("neutral".to_string())
+            .to_string();
+        let emotion = match raw_emotion.as_str() {
+            "anger" => Emotion::Anger,
+            "sadness" => Emotion::Sadness,
+            "happiness" => Emotion::Happiness,
+            _ => Emotion::Neutral,
+        };
+        Ok(emotion)
     }
 }
 
