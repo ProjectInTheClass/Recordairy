@@ -11,6 +11,8 @@ pub struct Diary {
     user_id: Uuid,
     audio_link: Option<String>,
     summary: Option<String>,
+    transcription: Option<String>,
+    emotion: Option<String>,
     is_private: bool,
 }
 
@@ -94,25 +96,61 @@ pub async fn update_diary(
     id: i64,
     audio_link: Option<String>,
     summary: Option<String>,
+    transcription: Option<String>,
+    emotion: Option<String>,
     is_private: Option<bool>,
 ) -> anyhow::Result<()> {
-    if audio_link.is_none() && summary.is_none() && is_private.is_none() {
+    if audio_link.is_none()
+        && summary.is_none()
+        && transcription.is_none()
+        && is_private.is_none()
+        && emotion.is_none()
+    {
         return Ok(());
     }
     let mut qry_builder: sqlx::QueryBuilder<'_, Postgres> =
         sqlx::query_builder::QueryBuilder::new("UPDATE diary SET ");
     let mut separated = qry_builder.separated(", ");
+    let mut first = true;
+
     if let Some(audio_link) = audio_link {
+        if !first {
+            separated.push_unseparated(", ");
+        }
         separated.push_unseparated("audio_link = ");
-        separated.push_bind(audio_link);
+        separated.push_bind_unseparated(audio_link);
+        first = false;
     }
     if let Some(summary) = summary {
+        if !first {
+            separated.push_unseparated(", ");
+        }
         separated.push_unseparated("summary = ");
-        separated.push_bind(summary);
+        separated.push_bind_unseparated(summary);
+        first = false;
+    }
+    if let Some(transcription) = transcription {
+        if !first {
+            separated.push_unseparated(", ");
+        }
+        separated.push_unseparated("transcription = ");
+        separated.push_bind_unseparated(transcription);
+        first = false;
+    }
+    if let Some(emotion) = emotion {
+        if !first {
+            separated.push_unseparated(", ");
+        }
+        separated.push_unseparated("emotion = ");
+        separated.push_bind_unseparated(emotion);
+        first = false;
     }
     if let Some(is_private) = is_private {
+        if !first {
+            separated.push_unseparated(", ");
+        }
         separated.push_unseparated("is_private = ");
-        separated.push_bind(is_private);
+        separated.push_bind_unseparated(is_private);
     }
 
     qry_builder.push(" WHERE id = ").push_bind(id);

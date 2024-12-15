@@ -14,6 +14,8 @@ struct DiaryModel: Decodable {
     let userId: String
     let audioLink: String
     let summary: String?
+    let transcription: String?
+    let emotion: String?
     let isPrivate: Bool
     
     enum CodingKeys: String, CodingKey {
@@ -23,6 +25,8 @@ struct DiaryModel: Decodable {
         case userId = "user_id"
         case audioLink = "audio_link"
         case summary
+        case transcription
+        case emotion
         case isPrivate = "is_private"
     }
 }

@@ -46,9 +46,9 @@ impl SupabaseClient {
     pub async fn upload_diary(
         &self,
         audio: Vec<u8>,
-        filename: String,
+        filename: &str,
     ) -> Result<String, anyhow::Error> {
-        self.upload(self.audio_bucket.clone(), filename.clone(), audio)
+        self.upload(self.audio_bucket.clone(), filename, audio)
             .await?;
         let presigned_suffix = self
             .get_presigned_download_url(self.audio_bucket.clone(), filename)
@@ -63,9 +63,9 @@ impl SupabaseClient {
     pub async fn upload_model(
         &self,
         model: Vec<u8>,
-        filename: String,
+        filename: &str,
     ) -> Result<String, anyhow::Error> {
-        self.upload(self.model_bucket.clone(), filename.clone(), model)
+        self.upload(self.model_bucket.clone(), filename, model)
             .await?;
         let presigned_suffix = self
             .get_presigned_download_url(self.model_bucket.clone(), filename)
@@ -80,7 +80,7 @@ impl SupabaseClient {
     pub async fn upload(
         &self,
         bucket: String,
-        filename: String,
+        filename: &str,
         file: Vec<u8>,
     ) -> Result<(), ReqwestError> {
         let url: String = format!(
@@ -108,7 +108,7 @@ impl SupabaseClient {
     pub async fn get_presigned_download_url(
         &self,
         bucket: String,
-        filename: String,
+        filename: &str,
     ) -> Result<String, anyhow::Error> {
         let url = format!(
             "{}/storage/v1/object/sign/{}/{}",

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     debug_handler,
     extract::{Multipart, Query, State},
@@ -10,6 +12,7 @@ use uuid::Uuid;
 
 use crate::{
     db::diary::{insert_diary, update_diary, Diary},
+    openai::{client::OpenAIClient, diary::summarize_diary},
     storage::client::SupabaseClient,
     utils::{get_diary_filename, parse_multipart::parse_multipart, sqlx::get_pg_tx},
     AppState,
@@ -56,11 +59,12 @@ pub struct CreateDiaryParams {
 #[debug_handler(state = AppState)]
 pub async fn create_diary(
     State(pool): State<PgPool>,
+    State(openai_client): State<Arc<OpenAIClient>>,
     State(storage_client): State<SupabaseClient>,
     Query(params): Query<CreateDiaryParams>,
     multipart: Multipart,
 ) -> axum::response::Result<String> {
-    let mut tx = get_pg_tx(pool).await?;
+    let mut tx = get_pg_tx(pool.clone()).await?;
     let result: anyhow::Result<_> = async {
         let (audio_bytes, _audio_metadata) = match parse_multipart(multipart).await {
             Ok(audio_data) => audio_data,
@@ -77,14 +81,45 @@ pub async fn create_diary(
             ),
         )
         .await?;
+        let audio_title = get_diary_filename(params.user_id, diary_id);
         let audio_link = storage_client
-            .upload_diary(
-                audio_bytes.to_vec(),
-                get_diary_filename(params.user_id, diary_id),
-            )
+            .upload_diary(audio_bytes.to_vec(), &audio_title)
             .await?;
+        update_diary(&mut tx, diary_id, Some(audio_link), None, None, None, None).await?;
 
-        update_diary(&mut tx, diary_id, Some(audio_link), None, None).await?;
+        // create a background subtask to transcribe the audio
+        tokio::spawn(async move {
+            let mut tx = get_pg_tx(pool.clone()).await.unwrap();
+            match openai_client.transcribe(&audio_title, &audio_bytes).await {
+                Ok(audio_transcription) => {
+                    if let Err(e) = update_diary(
+                        &mut tx,
+                        diary_id,
+                        None,
+                        None,
+                        Some(audio_transcription.clone()),
+                        None,
+                        None,
+                    )
+                    .await
+                    {
+                        tracing::error!("Failed to update diary with transcription: {}", e);
+                    } else {
+                        if let Err(e) = tx.commit().await {
+                            tracing::error!("Failed to commit transaction: {}", e);
+                        }
+                        tokio::spawn(async move {
+                            summarize_diary(pool, openai_client, diary_id, audio_transcription)
+                                .await;
+                        });
+                    }
+                }
+                Err(e) => {
+                    tracing::error!("Failed to transcribe audio: {}", e);
+                }
+            }
+        });
+
         Ok(diary_id)
     }
     .await;
