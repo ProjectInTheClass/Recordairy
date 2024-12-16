@@ -24,11 +24,6 @@ class AudioPlaybackViewModel: NSObject, ObservableObject, AVAudioPlayerDelegate
                     player.volume = 1.0
                     player.play()
                     self.isPlaying = true
-                    if !player.isPlaying {
-                        print("PLAYER IS NOT PLAYING")
-                    }
-                    print(player.duration)
-                    print("Playing: \(url)")
                 } catch {
                     self.isPlaying = false
                     print(
@@ -50,7 +45,6 @@ class AudioPlaybackViewModel: NSObject, ObservableObject, AVAudioPlayerDelegate
     func audioPlayerDidFinishPlaying(
         _ player: AVAudioPlayer, successfully flag: Bool
     ) {
-        print("Finished playing")
         isPlaying = false
     }
 }
