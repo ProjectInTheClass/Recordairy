@@ -1,496 +1,576 @@
-<!DOCTYPE HTML>
-<!--
-	Ethereal by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-	<head>
-		<title>Ethereal by HTML5 UP</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-	</head>
-	<body class="is-preload">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
 
-		<!-- Page Wrapper -->
-			<div id="page-wrapper">
+    <title>Recordiary</title>
+    <style>
+      /* 기본 스타일 */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: fit-content;
+        font-family: "Noto Sans KR", sans-serif;
+        overflow-x: hidden;
+        scroll-snap-type: mandatory;
+        margin: 0;
+      }
+      body {
+        background-color: #ffeb99;
+        transition: background-color 0.3s ease;
+      }
+      hr {
+        border: none;
+        border-top: 2px solid #2c3e50;
+      }
 
-				<!-- Wrapper -->
-					<div id="wrapper">
+      /* 첫 번째 섹션 */
+      #section1,
+      #section2 {
+        height: 100vh;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 100px;
+      }
+      #section1 img {
+        height: auto;
+        width: 40%;
+      }
+      #section2 img {
+        height: 80vh;
+        width: auto;
+      }
+      .text-container {
+        text-align: right;
+        top: 0;
+        right: 0; /* 화면 오른쪽 고정 */
+        width: 45%; /* 화면의 오른쪽 절반 차지 */
+      }
+      .text-container-left {
+        text-align: left;
+        top: 0;
+        left: 0; /* 화면 오른쪽 고정 */
+        width: 55%;
+      }
+      .text-container h1,
+      .text-container-left h1 {
+        font-size: 5rem; /* 제목 크기 */
+        color: #2c3e50; /* 제목 색상 */
+        margin: 0 0 20px; /* 제목 아래 간격 */
+      }
+      .text-container h2,
+      .text-container-left h2 {
+        font-size: 3rem; /* 제목 크기 */
+        color: #2c3e50; /* 제목 색상 */
+        margin: 0 0 20px; /* 제목 아래 간격 */
+      }
+      .text-container h3,
+      .text-container-left h3 {
+        font-size: 2rem;
+        color: #34495e;
+        margin: 20px 0 20px;
+      }
+      .text-container p,
+      .text-container-left p {
+        font-size: 1.5rem;
+        color: #555;
+        margin: 20px 0 20px;
+      }
+      .text-container li,
+      .text-container-left li {
+        font-size: 1.5rem;
+        color: #555;
+        margin: 20px 0 20px;
+      }
 
-						<!-- Panel (Banner) -->
-							<section class="panel banner right">
-								<div class="content color0 span-2-75">
-									<h1 class="major">Recordiary</h1>
-									<p>소리로 기록하는 나의 하루</p>
-								</div>
-								<div class="image filtered span-1-75" data-position="25% 25%">
-									<img src="images/pic01.jpg" alt="" />
-								</div>
-							</section>
-                            
-                            <section class="panel">
-                                <div class="image filtered span-1-75">
-                                   <video width="100%", height="100%" controls>
-                                   <source src="images/sample.mp4" type="video/mp4">
-                                      데모 영상
-                                   </video>
-                                </div>
-                                <div class="intro color2 span-2-75">
-                                   <h2 class="major">시연 영상</h2>
-                                   <p>매일 음성 일기를 새로 기록하고, <br>
-									 AI 감정 분석 결과를 확인해봐요.</p>
-                                </div>
-                            </section>
+      /* 방 섹션 */
+      #room-section {
+        position: relative;
+        height: 200vh; /* 방 섹션 길이 */
+      }
+      .room-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100vh; /* 화면 전체에 고정 */
+        background: url("images/room-background.png") no-repeat center center;
+        background-size: contain;
+        margin: 50px;
+        z-index: -1; /* 가구와 텍스트가 방 위에 표시되도록 설정 */
+      }
 
-							<section class="panel banner right">
-                                <div class="intro color2 span-2-75">
-                                    <h2 class="major">나만의 방 꾸미기</h2>
-                                    <p><b>"나"의 하루와 "나"의 취향이 모두 담긴 "나"만의 방을 완성해보세요!</b></p>
-                                    <P>일기가 담긴 가구를 방에 배치하여 나만의 방을 꾸며나갈 수 있습니다.</p>
-                                </div>
-                                <div class="image filtered span-1-75" data-position="25% 25%">
-                                    <img src="images/room1.png" alt="" />
-                                </div>
-                            </section>
-                            
-                            <section class="panel banner right">
-                                <div class="intro color2 span-2-75">
-                                    <h2 class="major">음성 일기 남기기</h2>
-                                    <p><b>나의 하루를 간편하게 음성으로 남겨보세요!</b></p>
-                                    <P>AI가 자동으로 분석한 오늘의 키워드와 함께라면, 음성을 남기는 것 만으로도 오늘 하루를 기억하기에 충분합니다.</p>
-                                </div>
-                                <div class="image filtered span-1-75" data-position="25% 25%">
-                                    <img src="images/rec2.png" alt="" />
-                                </div>
-                            </section>
-                            
-                            <section class="panel banner right">
-                                <div class="intro color2 span-2-75">
-                                    <h2 class="major">캘린더</h2>
-                                    <p><b>나의 감정이 완성하는 나의 하루, 나의 한 달</b></p>
-									<p>선택한 날짜를 누르면 그날의 음성 일기를 다시 들으며 감정의 흐름을 되짚어볼 수 있고, 감정 분석 결과와 키워드 요약도 확인해볼 수 있습니다.</p>
-									<p>또한, 월간 감정 통계와 감정 분포 그래프를 통해 나의 감정이 어떤 순간에 영향을 받았는지 돌아볼 수 있습니다.</p>
-									<p>긍정적인 순간들을 기록하고 되새기며, 나만의 감정 힐링 여정을 만들어 보세요.</p>
-                                </div>
-                                <div class="image filtered span-1-75" data-position="25% 25%">
-                                    <img src="images/calendar.png" alt="" />
-                                </div>
-                            </section>
-                            
-							<section class="panel banner right">
-                                <div class="intro color2 span-2-75">
-                                    <h2 class="major">일기 공유와 방명록</h2>
-                                    <p><b>나의 감정을 나누고 소중한 순간을 함께하는 공간</b></p>
-									<p>친구들과 나의 일기를 통해 감정을 나누고, 서로의 감정을 공감하며 연결되는 소통의 장을 만들어 보세요.</p>
-									<p>친구의 방명록에 메시지를 남기거나 음성 일기를 들으며 함께한 시간을 되돌아볼 수 있습니다.</p>
-									<p>나의 일상과 감정이 친구들과의 특별한 순간으로 이어집니다.</p>
-                                </div>
-                                <div class="image filtered span-1-75" data-position="25% 25%">
-                                    <img src="images/calendar.png" alt="" />
-                                </div>
-                            </section>
+      /* 오른쪽 텍스트 컨테이너 */
+      .text-container-right {
+        position: fixed; /* 오른쪽에 고정 */
+        top: 0;
+        right: 0; /* 화면 오른쪽 고정 */
+        width: 50%; /* 화면의 오른쪽 절반 차지 */
+        height: 100vh; /* 화면 전체 높이 */
+        padding: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: right;
+      }
 
-						<!-- Panel (Spotlight) -->
-							<section class="panel spotlight medium right" id="first">
-								<div class="content span-7">
-									<h2 class="major">기술 스택</h2>
-									<p><b>Frontend: SwiftUI</b></p>
-									<ul>
-										<li>녹음: AVAudioRecorder</li>
-										<li>3D 렌더링: SceneKit</li>
-									</ul>
-									<p><b>Backend: Rust(Axum)</b></p>
-									<ul>
-										<li>DB/Storage: Supabase(PostgreSQL, AWS S3)</li>
-										<li>AI: OpenAI API(Whisper, gpt-3.5)</li>
-										<li>배포: <a href="https://render.com/">Render</a></li>
-									</ul>
-								</div>
-								<div class="image filtered tinted" data-position="top left">
-									<img src="images/pic02.jpg" alt="" />
-								</div>
-							</section>
+      /* 가구와 텍스트 */
+      .furniture {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        transform: translate(-50%, -50%) scale(0.9);
+        opacity: 0;
+        transition: transform 0.8s ease, opacity 0.8s ease;
+      }
+      .furniture.visible {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      .text {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 20px;
+        opacity: 0;
+        transform: translateY(20%);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+      }
+      .text.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .text h2 {
+        font-size: 2.5rem; /* 제목 크기 */
+        color: #2c3e50; /* 제목 색상 */
+        margin: 0 0 20px; /* 제목 아래 간격 */
+      }
+      .text p {
+        font-size: 1.5rem; /* 본문 크기 */
+        color: #2c3e50; /* 본문 색상 */
+        margin: 0;
+        line-height: 1.5; /* 줄 간격 */
+      }
+      /* 이미지와 텍스트의 초기 상태 */
+      .scroll-fade {
+        opacity: 0; /* 투명하게 시작 */
+        transform: translateY(20px); /* 살짝 아래에 위치 */
+        transition: opacity 1.2s ease, transform 1.2s ease; /* 애니메이션 */
+      }
 
-						<!-- Panel -->
-							<section class="panel color1">
-								<div class="intro joined">
-									<h2 class="major">개발 과정</h2>
-									<p>Notion: 태스크 및 일정 관리</p>
-									<ul>
-										<li>김민아: FE - 마이홈, 녹음, 캘린더</li>
-										<li>문종건: BE, FE API 레이어, 3D 렌더링</li>
-										<li>권동민: FE - 소셜, 캘린더, 로그인</li>
-									</ul>
-								</div>
-								<div class="inner">
-									<img src="images/notion1.png" height="100%" alt="" />
-									<!-- <ul class="grid-icons three connected">
-										<li><span class="icon fa-gem"><span class="label">Lorem</span></span></li>
-										<li><span class="icon solid fa-camera-retro"><span class="label">Ipsum</span></span></li>
-										<li><span class="icon solid fa-cog"><span class="label">Dolor</span></span></li>
-										<li><span class="icon solid fa-paper-plane"><span class="label">Sit</span></span></li>
-										<li><span class="icon solid fa-chart-bar"><span class="label">Amet</span></span></li>
-										<li><span class="icon solid fa-code"><span class="label">Nullam</span></span></li>
-									</ul> -->
-								</div>
-							</section>
+      /* 뷰포트에 진입했을 때 활성화 */
+      .scroll-fade.visible {
+        opacity: 1; /* 불투명해짐 */
+        transform: translateY(0); /* 제자리로 이동 */
+      }
+      /* 컨테이너 스타일 */
+      .goals-container {
+        padding: 20px;
+        max-width: 1200px; /* 전체 레이아웃 최대 너비 */
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
 
-						<!-- Panel (Spotlight) -->
-							<!-- <section class="panel spotlight large left">
-								<div class="content span-5">
-									<h2 class="major">Magna amet tempus</h2>
-									<p>Mauris a cursus velit. Nunc lacinia sollicitudin egestas bibendum, magna dui bibendum ex, sagittis commodo enim risus sed magna nulla. Vestibulum ut consequat velit. Curabitur vitae libero lorem. Quisque iaculis porttitor blandit. Nullam quis sagittis maximus. Sed vel nibh libero. Mauris et lorem pharetra massa lorem turpis congue pulvinar.</p>
-								</div>
-								<div class="image filtered tinted" data-position="top right">
-									<img src="images/pic03.jpg" alt="" />
-								</div>
-							</section> -->
+      /* 가로 정렬을 위한 행 스타일 */
+      .goals-row {
+        display: flex;
+        justify-content: space-between; /* 카드 간격 균등 분배 */
+        flex-wrap: wrap; /* 화면 크기에 따라 줄 바꿈 가능 */
+      }
 
-						<!-- Panel -->
-							<!-- <section class="panel">
-								<div class="intro color2">
-									<h2 class="major">Elit integer</h2>
-									<p>Sed vel nibh libero. Mauris et lorem pharetra massa lorem turpis congue pulvinar. Vivamus sed feugiat finibus. Duis amet bibendum amet sed. Duis mauris ex, dapibus sed ligula tempus volutpat magna etiam.</p>
-								</div>
-								<div class="gallery">
-									<div class="group span-3">
-										<a href="images/gallery/fulls/01.jpg" class="image filtered span-3" data-position="bottom"><img src="images/gallery/thumbs/01.jpg" alt="" /></a>
-										<a href="images/gallery/fulls/02.jpg" class="image filtered span-1-5" data-position="center"><img src="images/gallery/thumbs/02.jpg" alt="" /></a>
-										<a href="images/gallery/fulls/03.jpg" class="image filtered span-1-5" data-position="bottom"><img src="images/gallery/thumbs/03.jpg" alt="" /></a>
-									</div>
-									<a href="images/gallery/fulls/04.jpg" class="image filtered span-2-5" data-position="top"><img src="images/gallery/thumbs/04.jpg" alt="" /></a>
-									<div class="group span-4-5">
-										<a href="images/gallery/fulls/05.jpg" class="image filtered span-3" data-position="top"><img src="images/gallery/thumbs/05.jpg" alt="" /></a>
-										<a href="images/gallery/fulls/06.jpg" class="image filtered span-1-5" data-position="center"><img src="images/gallery/thumbs/06.jpg" alt="" /></a>
-										<a href="images/gallery/fulls/07.jpg" class="image filtered span-1-5" data-position="bottom"><img src="images/gallery/thumbs/07.jpg" alt="" /></a>
-										<a href="images/gallery/fulls/08.jpg" class="image filtered span-3" data-position="top"><img src="images/gallery/thumbs/08.jpg" alt="" /></a>
-									</div>
-									<a href="images/gallery/fulls/09.jpg" class="image filtered span-2-5" data-position="right"><img src="images/gallery/thumbs/09.jpg" alt="" /></a>
-								</div>
-							</section> -->
+      /* 카드 스타일 */
+      .goal-card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 21px;
+        padding: 5px;
+        margin: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        flex: 1; /* 카드가 균등하게 너비를 차지 */
+        text-align: center;
+      }
 
-						<!-- Panel -->
-							<!-- <section class="panel color4-alt">
-								<div class="intro color4">
-									<h2 class="major">Contact</h2>
-									<p>Sed vel nibh libero. Mauris et lorem pharetra massa lorem turpis congue pulvinar. Vivamus sed feugiat finibus. Duis amet bibendum amet sed. Duis mauris ex, dapibus sed ligula tempus volutpat magna etiam.</p>
-								</div>
-								<div class="inner columns divided">
-									<div class="span-3-25">
-										<form method="post" action="#">
-											<div class="fields">
-												<div class="field half">
-													<label for="name">Name</label>
-													<input type="text" name="name" id="name" />
-												</div>
-												<div class="field half">
-													<label for="email">Email</label>
-													<input type="email" name="email" id="email" />
-												</div>
-												<div class="field">
-													<label for="message">Message</label>
-													<textarea name="message" id="message" rows="4"></textarea>
-												</div>
-											</div>
-											<ul class="actions">
-												<li><input type="submit" value="Send Message" class="button primary" /></li>
-											</ul>
-										</form>
-									</div>
-									<div class="span-1-5">
-										<ul class="contact-icons color1">
-											<li class="icon brands fa-twitter"><a href="#">@untitled-tld</a></li>
-											<li class="icon brands fa-facebook-f"><a href="#">facebook.com/untitled</a></li>
-											<li class="icon brands fa-snapchat-ghost"><a href="#">@untitled-tld</a></li>
-											<li class="icon brands fa-instagram"><a href="#">@untitled-tld</a></li>
-											<li class="icon brands fa-medium-m"><a href="#">medium.com/untitled</a></li>
-										</ul>
-									</div>
-								</div>
-							</section> -->
+      .goal-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        color: #6dafcf;
+      }
 
-						<!-- Panel -->
-							<!-- <section class="panel color2-alt">
-								<div class="intro color2">
-									<h2 class="major">Elements</h2>
-									<p>Sed vel nibh libero. Mauris et lorem pharetra massa lorem turpis congue pulvinar. Vivamus sed feugiat finibus. Duis amet bibendum amet sed. Duis mauris ex, dapibus sed ligula tempus volutpat magna etiam. </p>
-								</div>
-								<div class="inner columns aligned">
-									<div class="span-2-75">
+      .goal-card p {
+        font-size: 1.2rem;
+        color: #555;
+        line-height: 1.6;
+      }
 
-										<h3 class="major">Text</h3>
-										<p>This is <b>bold</b> and this is <strong>strong</strong>. This is <i>italic</i> and this is <em>emphasized</em>.
-										This is <sup>superscript</sup> text and this is <sub>subscript</sub> text.
-										This is <u>underlined</u> and this is code: <code>for (;;) { ... }</code>. Finally, <a href="#">this is a link</a>.</p>
+      /* 반응형 디자인 */
+      @media (max-width: 768px) {
+        .goal-card {
+          max-width: 100%; /* 작은 화면에서는 카드가 세로로 쌓임 */
+          flex: unset;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 첫 번째 섹션 -->
+    <div id="section1">
+      <img src="images/logo.png" alt="Recordiary Logo" />
+      <div class="text-container">
+        <h1>Recordiary</h1>
+        <h3>소리로 기록하는 나의 하루</h3>
+      </div>
+    </div>
 
-										<h1>Heading Level 1</h1>
-										<h2>Heading Level 2</h2>
-										<h3>Heading Level 3</h3>
-										<h4>Heading Level 4</h4>
-										<h5>Heading Level 5</h5>
-										<h6>Heading Level 6</h6>
+    <!-- 방 섹션 -->
+    <div id="room-section">
+      <!-- 방 그림 -->
+      <div class="room-container" id="room-container"></div>
+      <div class="text-container-right" id="text-container-right"></div>
+    </div>
 
-									</div>
-									<div class="span-3">
+    <div id="section2">
+      <video class="scroll-fade" width="37.5%;" , height="70%" controls>
+        <source src="images/sample.mp4" type="video/mp4" />
+        데모 영상
+      </video>
+      <div class="text-container scroll-fade">
+        <h2>시연 영상</h2>
+        <hr />
+        <p>
+          <b>매일 음성 일기를 기록</b>하고, <br />
+          <b>AI 감정 분석 결과를 확인</b>해봐요.
+        </p>
+      </div>
+    </div>
 
-										<h4>Blockquote</h4>
-										<blockquote>Lorem ipsum dolor sit amet. Felis sagittis eget tempus euismod. Vestibulum ante ipsum primis in vestibulum. Blandit adipiscing eu iaculis volutpat ac adipiscing volutpat ac adipiscing faucibus.</blockquote>
+    <div id="section2">
+      <div class="text-container-left scroll-fade">
+        <h2>나만의 방 꾸미기</h2>
+        <hr />
+        <h3>
+          나의 하루와 나의 취향이 모두 담긴<br /><b>나만의 방</b>을
+          완성해보세요!
+        </h3>
+        <p>
+          <b>일기가 담긴 가구를 방에 배치</b>하여 나만의 방을 꾸며나갈 수
+          있습니다.
+        </p>
+      </div>
+      <img class="scroll-fade" src="images/room1.png" alt="ScreenShot" />
+    </div>
 
-										<h4>Preformatted</h4>
-										<pre><code>i = 0;
+    <div id="section2">
+      <img class="scroll-fade" src="images/rec2.png" alt="ScreenShot" />
+      <div class="text-container scroll-fade">
+        <h2>음성 일기 남기기</h2>
+        <hr />
+        <h3>오늘 하루를 간편하게 음성으로 남겨보세요!</h3>
+        <p>
+          <b>AI가 자동으로 분석한 오늘의 키워드</b>와 함께라면, 음성을 남기는 것
+          만으로도 오늘 하루를 기억하기에 충분합니다.
+        </p>
+      </div>
+    </div>
 
-while (!deck.isInOrder()) {
-    print 'Iteration ' + (i++);
-    deck.shuffle();
-}
+    <div id="section2">
+      <div class="text-container-left scroll-fade">
+        <h2>캘린더</h2>
+        <hr />
+        <h3>나의 감정이 기록하는 나의 하루, 나의 한 달!</h3>
+        <p>
+          AI 감정 분석을 기반으로 각 날짜의 <b>감정 상태가 색상으로 표시</b>되어
+          한눈에 나의 감정 흐름을 확인할 수 있습니다.<br /><br />
+          <b>월간 감정 통계 그래프</b>를 통해 감정의 패턴과 변화 추이를
+          확인하고, 나의 감정을 돌아보세요.
+        </p>
+      </div>
+      <img class="scroll-fade" src="images/calander1.png" alt="ScreenShot" />
+    </div>
 
-print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
+    <div id="section2">
+      <div class="text-container-left scroll-fade">
+        <p>
+          날짜를 선택하여 그날의 음성 일기를 다시 들어볼 수 있고, 감정 분석
+          결과와 키워드 요약을 통해 그날의 감정을 다시금 느껴볼 수 있습니다.
+          <br />
+          <br />
+          긍정적인 순간들을 기록하고 되새기며, 나만의 감정 힐링 여정을 만들어
+          보세요.
+        </p>
+      </div>
+      <img class="scroll-fade" src="images/calander2.png" alt="ScreenShot" />
+    </div>
 
-									</div>
-									<div class="span-1-25">
+    <div id="section2">
+      <img class="scroll-fade" src="images/social1.png" alt="ScreenShot" />
+      <div class="text-container scroll-fade">
+        <h2>내 일기를 공유하고 방명록 남기기</h2>
+        <hr />
+        <h3>소중한 순간은 언제나 함께!</h3>
+        <p>
+          <b>친구들과 일기를 공유</b>하여 서로의 감정과 공감을 나누는 소통의
+          장을 만들어 보세요.
+        </p>
+      </div>
+    </div>
 
-										<h3 class="major">Lists</h3>
+    <div id="section2">
+      <img class="scroll-fade" src="images/social2.png" alt="ScreenShot" />
+      <div class="text-container scroll-fade">
+        <p>
+          <b
+            >친구의 방명록에 메시지를 남기거나 친구가 내게 남긴 방명록을 들을 수
+            있습니다.</b
+          ><br /><br />나의 일상과 감정이 친구들과의 특별한 순간으로 이어집니다.
+        </p>
+      </div>
+    </div>
 
-										<h4>Unordered</h4>
-										<ul>
-											<li>Lorem ipsum dolor sit.</li>
-											<li>Dolor pulvinar etiam.</li>
-											<li>Etiam vel felis viverra.</li>
-										</ul>
+    <div class="scroll-fade" id="section1">
+      <div class="text-container-left">
+        <h2>Tech Stack</h2>
+        <hr />
+        <h3><br /><b>Frontend: SwiftUI</b></h3>
+        <ul>
+          <li>녹음: AVAudioRecorder</li>
+          <li>3D 렌더링: SceneKit</li>
+        </ul>
+        <h3><br /><b>Backend: Rust(Axum)</b></h3>
+        <ul>
+          <li>DB/Storage: Supabase(PostgreSQL, AWS S3)</li>
+          <li>AI: OpenAI API(Whisper, gpt-3.5)</li>
+          <li>배포: <a href="https://render.com/">Render</a></li>
+        </ul>
+      </div>
+    </div>
 
-										<h4>Alternate</h4>
-										<ul class="alt">
-											<li>Lorem ipsum dolor sit.</li>
-											<li>Dolor pulvinar etiam.</li>
-											<li>Etiam vel felis viverra.</li>
-											<li>Felis enim feugiat.</li>
-										</ul>
+    <div class="scroll-fade" id="section1">
+      <div class="text-container-left">
+        <h2>Process</h2>
+        <hr />
+        <h3><br /><b>Notion</b>: 테스크 및 일정 관리</h3>
+        <h3><br />Role and Responsibility</h3>
+        <div class="goals-row">
+          <div class="goal-card">
+            <h3>김민아</h3>
+            <p><b>FE</b><br />마이홈, 녹음, 캘린더</p>
+          </div>
+          <div class="goal-card">
+            <h3>문종건</h3>
+            <p><b>BE, FE</b><br />API 레이어, 3D 렌더링</p>
+          </div>
+          <div class="goal-card">
+            <h3>권동민</h3>
+            <p><b>FE</b><br />소셜, 캘린더, 로그인</p>
+          </div>
+        </div>
+      </div>
+      <img src="images/notion1.png" alt="ScreenShot" />
+    </div>
 
-									</div>
-									<div class="span-1-5">
+    <div class="scroll-fade" id="section1">
+      <div class="text-container-left">
+        <h2>Future Plans</h2>
+        <hr />
+        <h3><br />가구 배치 기능</h3>
+        <p>마이홈 내부 그리드 위로 가구 드래그앤드랍하여 가구 위치 결정</p>
+        <h3><br />소셜 기능</h3>
+        <p>로그인, 친구 추가 등 유저 데이터 서버와 연결</p>
+        <h3><br />3월 출시</h3>
+      </div>
+    </div>
 
-										<h4>Ordered</h4>
-										<ol>
-											<li>Lorem ipsum dolor sit.</li>
-											<li>Dolor pulvinar etiam.</li>
-											<li>Etiam vel felis viverra.</li>
-											<li>Felis enim feugiat.</li>
-											<li>Etiam vel felis lorem.</li>
-										</ol>
+    <div id="section1">
+      <img src="images/logo.png" alt="Recordiary Logo" />
+      <div class="text-container">
+        <h1>About Us<br /></h1>
+        <div class="goal-card">
+          <h3>김민아</h3>
+          <p>alsdk0613@icloud.com</p>
+        </div>
+        <div class="goal-card">
+          <h3>문종건</h3>
+          <p>andrewmjk1@naver.com</p>
+        </div>
+        <div class="goal-card">
+          <h3>권동민</h3>
+          <p>charlie0315@naver.com</p>
+        </div>
+      </div>
+    </div>
 
-										<h4>Actions</h4>
-										<ul class="actions">
-											<li><a href="#" class="button primary color2">Default</a></li>
-											<li><a href="#" class="button">Default</a></li>
-										</ul>
-										<ul class="actions stacked">
-											<li><a href="#" class="button primary color2">Default</a></li>
-											<li><a href="#" class="button">Default</a></li>
-										</ul>
+    <!-- 동적으로 추가할 가구와 텍스트 -->
+    <script>
+      const roomData = [
+        {
+          furnitureSrc: "images/furniture1.png",
+          title: "일기를 꾸준하게 남겨보고 싶나요?",
+          description: "",
+        },
+        {
+          furnitureSrc: "images/furniture2.png",
+          title: "녹음 방식으로 세상 간편하게!",
+          description: "",
+        },
+        {
+          furnitureSrc: "images/furniture3.png",
+          title: "나의 이야기로 나의 공간을 꾸며보세요!",
+          description: "",
+        },
+      ];
 
-									</div>
-									<div class="span-1-25">
+      const roomContainer = document.getElementById("room-container");
+      const textContainerRight = document.getElementById(
+        "text-container-right"
+      );
+      const roomSection = document.getElementById("room-section");
 
-										<h4>Icons</h4>
-										<ul class="icons">
-											<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-											<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-											<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-											<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
-											<li><a href="#" class="icon brands fa-medium-m"><span class="label">Medium</span></a></li>
-										</ul>
+      roomContainer.style.opacity = "0";
 
-										<h4>Contact Icons</h4>
-										<ul class="contact-icons color2">
-											<li class="icon brands fa-twitter"><a href="#">Twitter</a></li>
-											<li class="icon brands fa-facebook-f"><a href="#">Facebook</a></li>
-											<li class="icon brands fa-instagram"><a href="#">Instagram</a></li>
-											<li class="icon brands fa-github"><a href="#">GitHub</a></li>
-											<li class="icon brands fa-medium-m"><a href="#">Medium</a></li>
-										</ul>
+      // 동적 생성: 가구와 텍스트 추가
+      roomData.forEach((item, index) => {
+        const furniture = document.createElement("img");
+        furniture.src = item.furnitureSrc;
+        furniture.alt = `Furniture ${index + 1}`;
+        furniture.className = "furniture";
+        furniture.style.zIndex = `${10 - index}`; // 순서대로 겹치지 않도록
+        roomContainer.appendChild(furniture);
 
-									</div>
-									<div class="span-3">
-										<h3 class="major">Table</h3>
-										<h4>Default</h4>
-										<div class="table-wrapper">
-											<table>
-												<thead>
-													<tr>
-														<th>Name</th>
-														<th>Description</th>
-														<th>Price</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td>Item One</td>
-														<td>Ante turpis integer aliquet porttitor.</td>
-														<td>29.99</td>
-													</tr>
-													<tr>
-														<td>Item Two</td>
-														<td>Vis ac commodo adipiscing arcu aliquet.</td>
-														<td>19.99</td>
-													</tr>
-													<tr>
-														<td>Item Three</td>
-														<td> Morbi faucibus arcu accumsan lorem.</td>
-														<td>29.99</td>
-													</tr>
-													<tr>
-														<td>Item Four</td>
-														<td>Vitae integer tempus condimentum.</td>
-														<td>19.99</td>
-													</tr>
-												</tbody>
-												<tfoot>
-													<tr>
-														<td colspan="2"></td>
-														<td>100.00</td>
-													</tr>
-												</tfoot>
-											</table>
-										</div>
-									</div>
-									<div class="span-3">
-										<h4>Alternate</h4>
-										<div class="table-wrapper">
-											<table class="alt">
-												<thead>
-													<tr>
-														<th>Name</th>
-														<th>Description</th>
-														<th>Price</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td>Item One</td>
-														<td>Ante turpis integer aliquet porttitor.</td>
-														<td>29.99</td>
-													</tr>
-													<tr>
-														<td>Item Two</td>
-														<td>Vis ac commodo adipiscing arcu aliquet.</td>
-														<td>19.99</td>
-													</tr>
-													<tr>
-														<td>Item Three</td>
-														<td> Morbi faucibus arcu accumsan lorem.</td>
-														<td>29.99</td>
-													</tr>
-													<tr>
-														<td>Item Four</td>
-														<td>Vitae integer tempus condimentum.</td>
-														<td>19.99</td>
-													</tr>
-													<tr>
-														<td>Item Five</td>
-														<td>Ante turpis integer aliquet porttitor.</td>
-														<td>29.99</td>
-													</tr>
-												</tbody>
-												<tfoot>
-													<tr>
-														<td colspan="2"></td>
-														<td>100.00</td>
-													</tr>
-												</tfoot>
-											</table>
-										</div>
-									</div>
-									<div class="span-2-25">
-										<h3 class="major">Buttons</h3>
-										<ul class="actions">
-											<li><a href="#" class="button primary color2">Primary</a></li>
-											<li><a href="#" class="button">Default</a></li>
-										</ul>
-										<ul class="actions">
-											<li><a href="#" class="button">Default</a></li>
-											<li><a href="#" class="button large">Large</a></li>
-											<li><a href="#" class="button small">Small</a></li>
-										</ul>
-										<ul class="actions">
-											<li><a href="#" class="button primary color2 icon solid fa-cog">Icon</a></li>
-											<li><a href="#" class="button icon fa-gem">Icon</a></li>
-										</ul>
-										<ul class="actions">
-											<li><span class="button primary color2 disabled">Disabled</span></li>
-											<li><span class="button disabled">Disabled</span></li>
-										</ul>
-										<ul class="actions">
-											<li><a href="#" class="button primary color2 circle icon solid fa-cog">Icon</a></li>
-											<li><a href="#" class="button circle icon fa-gem">Icon</a></li>
-										</ul>
-									</div>
-									<div class="span-4-5">
-										<h3 class="major">Form</h3>
-										<form method="post" action="#">
-											<div class="fields">
-												<div class="field third">
-													<label for="demo-name">Name</label>
-													<input type="text" name="demo-name" id="demo-name" value="" placeholder="Jane Doe" />
-												</div>
-												<div class="field third">
-													<label for="demo-email">Email</label>
-													<input type="email" name="demo-email" id="demo-email" value="" placeholder="jane@untitled.tld" />
-												</div>
-												<div class="field third">
-													<label for="demo-category">Category</label>
-													<div class="select-wrapper">
-														<select name="demo-category" id="demo-category">
-															<option value="">-</option>
-															<option value="1">Manufacturing</option>
-															<option value="1">Shipping</option>
-															<option value="1">Administration</option>
-															<option value="1">Human Resources</option>
-														</select>
-													</div>
-												</div>
-												<div class="field quarter">
-													<input type="radio" id="demo-priority-low" name="demo-priority" class="color2" checked />
-													<label for="demo-priority-low">Low Priority</label>
-												</div>
-												<div class="field quarter">
-													<input type="radio" id="demo-priority-high" name="demo-priority" class="color2" />
-													<label for="demo-priority-high">High Priority</label>
-												</div>
-												<div class="field quarter">
-													<input type="checkbox" id="demo-copy" name="demo-copy" class="color2" />
-													<label for="demo-copy">Email a copy</label>
-												</div>
-												<div class="field quarter">
-													<input type="checkbox" id="demo-human" name="demo-human" class="color2" checked />
-													<label for="demo-human">Not a robot</label>
-												</div>
-												<div class="field">
-													<label for="demo-message">Message</label>
-													<textarea name="demo-message" id="demo-message" placeholder="Enter your message" rows="2"></textarea>
-												</div>
-											</div>
-											<ul class="actions">
-												<li><input type="submit" value="Send Message" class="primary color2" /></li>
-												<li><input type="reset" value="Reset" /></li>
-											</ul>
-										</form>
-									</div>
-								</div>
-							</section> -->
+        // 텍스트 컨테이너
+        const text = document.createElement("div");
+        text.className = "text";
 
-						<!-- Copyright -->
-							<div class="copyright">&copy; Recordiary. Design: <a href="https://html5up.net">HTML5 UP</a>.</div>
-					</div>
-			</div>
+        // 제목 (h2)와 본문 (p) 추가
+        const title = document.createElement("h2");
+        title.textContent = item.title;
+        const description = document.createElement("p");
+        description.textContent = item.description;
 
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/main.js"></script>
+        text.appendChild(title);
+        text.appendChild(description);
+        textContainerRight.appendChild(text);
+      });
 
-	</body>
+      const furnitures = document.querySelectorAll(".furniture");
+      const texts = document.querySelectorAll(".text");
+
+      // 스크롤 트리거 계산
+      const roomStart = roomSection.offsetTop;
+      const roomHeight = roomSection.offsetHeight;
+      const triggers = [70, 120, 180];
+
+      // 스크롤 이벤트
+      window.addEventListener("scroll", () => {
+        const scrollY = window.scrollY;
+
+        // 방 그림 등장/사라짐
+        if (
+          scrollY >= (60 * window.innerHeight) / 100 &&
+          scrollY <= (230 * window.innerHeight) / 100
+        ) {
+          roomContainer.style.opacity = "1";
+        } else {
+          roomContainer.style.opacity = "0";
+        }
+
+        // 방 그림의 움직임 계산 (스크롤에 따라 살짝 이동)
+        const roomScrollRatio = Math.min(
+          Math.max((scrollY - roomStart) / roomHeight, 0),
+          1
+        );
+        roomContainer.style.transform = `translateY(${roomScrollRatio}px)`; // 방 그림 살짝 이동
+
+        // 배경색 변경
+        let startColor, endColor, progress;
+        const scrollHeight =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const firstPhaseEnd = scrollHeight * 0.72; // 첫 번째 색상 전환 구간
+        const secondPhaseEnd = scrollHeight; // 두 번째 색상 전환 구간
+        // 첫 번째 단계: #FFEB99 → #FFFFFF
+        if (scrollY <= firstPhaseEnd) {
+          startColor = [255, 235, 153]; // #FFEB99
+          endColor = [255, 255, 255]; // #FFFFFF
+          progress = scrollY / firstPhaseEnd;
+
+          // 두 번째 단계: #FFFFFF → #6DAFCF
+        } else if (scrollY <= secondPhaseEnd) {
+          startColor = [255, 255, 255]; // #FFFFFF
+          endColor = [109, 175, 207]; // #6DAFCF
+          progress =
+            (scrollY - firstPhaseEnd) / (secondPhaseEnd - firstPhaseEnd);
+
+          // 세 번째 단계: 고정된 색상 #6DAFCF
+        } else {
+          startColor = [109, 175, 207]; // #6DAFCF
+          endColor = [109, 175, 207]; // 고정된 색상
+          progress = 1;
+        }
+
+        // 색상 보간 (LERP)
+        const newColor = startColor.map((start, i) =>
+          Math.round(start + (endColor[i] - start) * progress)
+        );
+
+        // 배경색 적용
+        document.body.style.backgroundColor = `rgb(${newColor.join(",")})`;
+
+        // 가구와 텍스트 등장 처리
+        furnitures.forEach((furniture, index) => {
+          if (scrollY >= (triggers[index] * window.innerHeight) / 100) {
+            furniture.classList.add("visible");
+            texts.forEach((text, i) => {
+              if (i === index) {
+                text.classList.add("visible");
+              } else {
+                text.classList.remove("visible");
+              }
+            });
+            furnitures.forEach((furniture, i) => {
+              if (i === index) {
+                furniture.classList.add("visible");
+              } else {
+                furniture.classList.remove("visible");
+              }
+            });
+          } else {
+            furnitures[index].classList.remove("visible");
+            texts[index].classList.remove("visible");
+          }
+        });
+        if (scrollY >= (230 * window.innerHeight) / 100) {
+          texts[furnitures.length - 1].classList.remove("visible");
+        }
+      });
+      // Intersection Observer 설정
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              // 요소가 뷰포트에 들어오면 'visible' 클래스 추가
+              entry.target.classList.add("visible");
+            }
+          });
+        },
+        {
+          threshold: 0.2, // 20% 뷰포트에 들어왔을 때 트리거
+        }
+      );
+
+      // 관찰할 요소 선택
+      const fadeElements = document.querySelectorAll(".scroll-fade");
+
+      // 각 요소를 관찰
+      fadeElements.forEach((el) => observer.observe(el));
+    </script>
+  </body>
 </html>
