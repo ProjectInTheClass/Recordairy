@@ -33,8 +33,8 @@ struct DiaryConnectedFurniture: Identifiable {
 
 //기본 일기 구조체
 struct DiaryEntry: Identifiable {
-    var id = UUID()
-    var user_id: Int
+    var id: Int
+    var user_id: String
     var created_at: Date
     var local_date: String
     var emotion: Emotion

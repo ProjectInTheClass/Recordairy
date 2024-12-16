@@ -62,6 +62,11 @@ struct CalendarView: View {
             Spacer()
             Text("\(viewModel.currentMonth, formatter: monthFormatter)")
                 .font(.headline)
+            Button(action: {
+                viewModel.populateEntries()
+            }) {
+                Image(systemName: "arrow.clockwise")
+            }
             Spacer()
             Button(action: {
                 viewModel.updateMonth(by: 1)

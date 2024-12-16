@@ -65,7 +65,8 @@ let diaryDummyData: [DiaryEntry] = [
 //        connectedFurniture: furnitureDummyData[0]
 //    ),
     DiaryEntry(
-        user_id: 2,
+        id: 111,
+        user_id: "2",
         created_at: Calendar.current.date(byAdding: .day, value: -1, to: Date())!, // 어제
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!),
         emotion: .neutral,
@@ -76,7 +77,8 @@ let diaryDummyData: [DiaryEntry] = [
         connectedFurniture: furnitureDummyData[1]
     ),
     DiaryEntry(
-        user_id: 3,
+        id: 112,
+        user_id: "3",
         created_at: Calendar.current.date(byAdding: .day, value: -2, to: Date())!, // 2일 전
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -2, to: Date())!),
         emotion: .sadness,
@@ -87,7 +89,8 @@ let diaryDummyData: [DiaryEntry] = [
         connectedFurniture: nil
     ),
     DiaryEntry(
-        user_id: 4,
+        id: 113,
+        user_id: "4",
         created_at: Calendar.current.date(byAdding: .day, value: -3, to: Date())!, // 3일 전
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -3, to: Date())!),
         emotion: .anger,
