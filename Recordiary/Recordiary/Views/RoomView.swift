@@ -93,7 +93,10 @@ struct RoomView: View {
 
 // Empty room layout with walls and default lighting
 func createBaseRoom() -> SCNScene {
-    let scene = SCNScene()
+    guard let url = Bundle.main.url(forResource: "InteriorRoom", withExtension: "usdz") else {
+        fatalError("Could not find InteriorRoom.usdz")
+    }
+    let scene = try! SCNScene(url: url, options: nil)
     let roomSize: Float = 15
     let wallThickness: CGFloat = 0.5  // Adjust as needed
     
@@ -110,7 +113,7 @@ func createBaseRoom() -> SCNScene {
         chamferRadius: 0)
     let leftWallNode = SCNNode(geometry: leftWallGeometry)
     leftWallNode.position = SCNVector3(x: -roomSize / 2, y: 0, z: 0)
-    scene.rootNode.addChildNode(leftWallNode)
+    // scene.rootNode.addChildNode(leftWallNode)
 
     // Bottom wall
     let bottomWallGeometry = SCNBox(
@@ -118,7 +121,7 @@ func createBaseRoom() -> SCNScene {
         chamferRadius: 0)
     let bottomWallNode = SCNNode(geometry: bottomWallGeometry)
     bottomWallNode.position = SCNVector3(x: 0, y: -roomSize / 2, z: 0)
-    scene.rootNode.addChildNode(bottomWallNode)
+    // scene.rootNode.addChildNode(bottomWallNode)
 
     // Back wall
     let backWallGeometry = SCNBox(
@@ -126,7 +129,7 @@ func createBaseRoom() -> SCNScene {
         chamferRadius: 0)
     let backWallNode = SCNNode(geometry: backWallGeometry)
     backWallNode.position = SCNVector3(x: 0, y: 0, z: -roomSize / 2)
-    scene.rootNode.addChildNode(backWallNode)
+    // scene.rootNode.addChildNode(backWallNode)
 
     // --- Add color to the walls ---
     
@@ -138,7 +141,7 @@ func createBaseRoom() -> SCNScene {
     cameraNode.camera = SCNCamera()
     cameraNode.position = SCNVector3(x: roomSize*0.8, y: roomSize, z: roomSize*0.8)  // Moved camera up
     cameraNode.look(at: SCNVector3(x: 0, y: 0, z: 0))
-    scene.rootNode.addChildNode(cameraNode)
+    //scene.rootNode.addChildNode(cameraNode)
 
     // --- Add more realistic lighting ---
     let ambientLightNode = SCNNode()
@@ -153,7 +156,7 @@ func createBaseRoom() -> SCNScene {
     directionalLightNode.light!.castsShadow = true
     directionalLightNode.light?.categoryBitMask = -1
     directionalLightNode.light!.shadowMode = .deferred  // For smoother shadows
-    directionalLightNode.light!.intensity = 1000 // Brighter light
+    directionalLightNode.light!.intensity = 3000 // Brighter light
     
     directionalLightNode.position = SCNVector3(x: roomSize/2, y: roomSize, z: roomSize/2)
     directionalLightNode.look(at: SCNVector3(x: 0, y: 0, z: 0))

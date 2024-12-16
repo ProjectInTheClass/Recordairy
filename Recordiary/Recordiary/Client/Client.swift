@@ -42,6 +42,26 @@ struct APIClient {
         }
     }
 
+    func getCalendar(userId: String, year: Int64, month: Int64) async -> Result<
+        [CalendarEntryModel], AFError
+    > {
+        let parameters: [String: Any] = [
+            "user_id": userId,
+            "year": year,
+            "month": month,
+        ]
+        return await withCheckedContinuation {
+            continuation in
+            AF.request(API_URL + "/calendar", parameters: parameters)
+                .responseDecodable(
+                    of: [CalendarEntryModel].self, decoder: decoder
+                ) {
+                    response in
+                    continuation.resume(returning: response.result)
+                }
+        }
+    }
+
     func postDiary(userId: String, isPrivate: Bool, audioFile: Data) async
         -> Result<Int64, Error>
     {
