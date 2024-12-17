@@ -52,6 +52,120 @@ let furnitureDummyData = [
     )
 ]
 
+
+let diaryDummyData: [DiaryEntry] = [
+    DiaryEntry(
+        user_id: 1,
+        created_at: Calendar.current.date(byAdding: .day, value: -1, to: Date())!,
+        local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!),
+        emotion: .happiness,
+        audio_link: URL(string: "https://example.com/audio1.mp3")!,
+        keyWord: "행복",
+        transcribedText: "정말 즐거운 하루였다.",
+        is_private: true,
+        connectedFurniture: nil
+    ),
+    DiaryEntry(
+        user_id: 2,
+        created_at: Calendar.current.date(byAdding: .day, value: -2, to: Date())!,
+        local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -2, to: Date())!),
+        emotion: .neutral,
+        audio_link: URL(string: "https://example.com/audio2.mp3")!,
+        keyWord: "보통",
+        transcribedText: "평범한 하루를 보냈다.",
+        is_private: false,
+        connectedFurniture: nil
+    ),
+    DiaryEntry(
+        user_id: 3,
+        created_at: Calendar.current.date(byAdding: .day, value: -3, to: Date())!,
+        local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -3, to: Date())!),
+        emotion: .sadness,
+        audio_link: URL(string: "https://example.com/audio3.mp3")!,
+        keyWord: "슬픔",
+        transcribedText: "조금 우울했지만 괜찮았다.",
+        is_private: true,
+        connectedFurniture: nil
+    ),
+    DiaryEntry(
+        user_id: 4,
+        created_at: Calendar.current.date(byAdding: .day, value: -4, to: Date())!,
+        local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -4, to: Date())!),
+        emotion: .anger,
+        audio_link: URL(string: "https://example.com/audio4.mp3")!,
+        keyWord: "분노",
+        transcribedText: "화나는 일이 많았다.",
+        is_private: false,
+        connectedFurniture: nil
+    ),
+    DiaryEntry(
+        user_id: 5,
+        created_at: Calendar.current.date(byAdding: .day, value: -5, to: Date())!,
+        local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -5, to: Date())!),
+        emotion: .happiness,
+        audio_link: URL(string: "https://example.com/audio5.mp3")!,
+        keyWord: "기쁨",
+        transcribedText: "즐겁고 기쁜 하루였다.",
+        is_private: false,
+        connectedFurniture: furnitureDummyData[0]
+    ),
+    DiaryEntry(
+        user_id: 6,
+        created_at: Calendar.current.date(byAdding: .day, value: -6, to: Date())!,
+        local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -6, to: Date())!),
+        emotion: .neutral,
+        audio_link: URL(string: "https://example.com/audio6.mp3")!,
+        keyWord: "평온",
+        transcribedText: "평온한 하루를 보냈다.",
+        is_private: true,
+        connectedFurniture: furnitureDummyData[1]
+    ),
+    DiaryEntry(
+        user_id: 7,
+        created_at: Calendar.current.date(byAdding: .day, value: -7, to: Date())!,
+        local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -7, to: Date())!),
+        emotion: .sadness,
+        audio_link: URL(string: "https://example.com/audio7.mp3")!,
+        keyWord: "울적함",
+        transcribedText: "조금 울적했지만 희망이 있었다.",
+        is_private: false,
+        connectedFurniture: nil
+    ),
+    DiaryEntry(
+        user_id: 8,
+        created_at: Calendar.current.date(byAdding: .day, value: -8, to: Date())!,
+        local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -8, to: Date())!),
+        emotion: .anger,
+        audio_link: URL(string: "https://example.com/audio8.mp3")!,
+        keyWord: "짜증",
+        transcribedText: "짜증나는 일이 많았던 하루였다.",
+        is_private: true,
+        connectedFurniture: furnitureDummyData[2]
+    ),
+    DiaryEntry(
+        user_id: 9,
+        created_at: Calendar.current.date(byAdding: .day, value: -9, to: Date())!,
+        local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -9, to: Date())!),
+        emotion: .happiness,
+        audio_link: URL(string: "https://example.com/audio9.mp3")!,
+        keyWord: "즐거움",
+        transcribedText: "정말 즐거운 하루를 보냈다.",
+        is_private: false,
+        connectedFurniture: nil
+    ),
+    DiaryEntry(
+        user_id: 10,
+        created_at: Calendar.current.date(byAdding: .day, value: -10, to: Date())!,
+        local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -10, to: Date())!),
+        emotion: .neutral,
+        audio_link: URL(string: "https://example.com/audio10.mp3")!,
+        keyWord: "평범",
+        transcribedText: "별 일 없이 평범한 하루였다.",
+        is_private: false,
+        connectedFurniture: furnitureDummyData[3]
+    )
+]
+/*
 let diaryDummyData: [DiaryEntry] = [
 //    DiaryEntry(
 //        user_id: 1,
@@ -101,7 +215,7 @@ let diaryDummyData: [DiaryEntry] = [
         connectedFurniture: nil
     )
 ]
-
+*/
 let diaryConnectedFurnitureDummyData: [DiaryConnectedFurniture] = [
 //    DiaryConnectedFurniture(
 //        furniture: furnitureDummyData[0], // 벽지

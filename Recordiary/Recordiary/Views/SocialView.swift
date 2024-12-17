@@ -195,10 +195,18 @@ struct GuestBookModal: View {
     @Binding var isPresented: Bool
     
     @State private var guestBookEntries: [GuestBookEntry] = [
-        GuestBookEntry(name: "친구1", message: "가구 내놔라"),
-        GuestBookEntry(name: "친구2", message: "답장좀요"),
-        GuestBookEntry(name: "친구3", message: "우리집이 더 나음")
+        GuestBookEntry(name: "지나가는 나그네", message: "가구 내놔라",profileImageName: "p1"),
+        GuestBookEntry(name: "팽현숙", message: "답장좀요",profileImageName: "p2"),
+        GuestBookEntry(name: "치즈", message: "우리집이 더 나음",profileImageName: "p3"),
+        GuestBookEntry(name: "김철수", message: "오늘도 좋은 하루 되세요!",profileImageName: "p4"),
+        GuestBookEntry(name: "이유진", message: "오랜만에 방명록 남겨요 😊",profileImageName: "p5"),
+        GuestBookEntry(name: "햇님", message: "여기 너무 예쁘네요!",profileImageName: "p6"),
+        GuestBookEntry(name: "별빛", message: "따뜻한 일기가 느껴져요.",profileImageName: "p7"),
+        GuestBookEntry(name: "고구마", message: "친구 방명록은 처음이네요~",profileImageName: "p8"),
+        GuestBookEntry(name: "하늘색", message: "좋은 소식 있으면 알려주세요!",profileImageName: "p9"),
+
     ]
+
     
     var body: some View {
         CustomModal{
@@ -219,6 +227,50 @@ struct GuestBookModal: View {
                 .padding(.horizontal)
                 
                 ScrollView {
+                    VStack(spacing: 12) { // 블록 간격을 동일하게
+                        ForEach(guestBookEntries) { entry in
+                            HStack(spacing: 12) {
+                                Circle()
+                                    .fill(Color(hex: "#E0E0E0"))
+                                    .frame(width: 56, height: 56)
+                                    .overlay(
+                                        Image(entry.profileImageName)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .clipShape(Circle())
+                                            .font(.system(size: 24))
+                                            .foregroundColor(.gray)
+                                    )
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(entry.message)
+                                        .font(.subheadline)
+                                        .foregroundColor(.black)
+                                    Text(entry.name)
+                                        .font(.footnote)
+                                        .foregroundColor(.gray)
+                                }
+                                Spacer()
+                                
+                                Button(action: { /* 재생 */ }) {
+                                    let audioURL = URL(string: "https://example.com/audio5.mp3")!
+                                    ReusablePlayButton(viewModel: playbackViewModel, audioURL: audioURL)
+                                }
+                                Button(action: { /* 답장 */ }) {
+                                    RectButton(iconName: "arrowshape.turn.up.right")
+                                }
+                            }
+                            .frame(height: 88) // 각 블록 높이 고정
+                            .padding(.horizontal, 12) // 전체 패딩 정리
+                            .background(Color.white)
+                            .cornerRadius(21)
+                            .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
+                        }
+                    }
+                    .padding(.vertical, 8) // 상하 여백만 적용
+                }
+
+               /* ScrollView {
                     VStack(spacing: 16) {
                         ForEach(guestBookEntries) { entry in
                             HStack(spacing: 16) {
@@ -256,7 +308,7 @@ struct GuestBookModal: View {
                             .cornerRadius(21)
                         }
                     }
-                }
+                }*/
                 .padding(.horizontal)
             }
             .padding(.horizontal)
@@ -269,6 +321,7 @@ struct GuestBookEntry: Identifiable {
     let id = UUID()
     let name: String
     let message: String
+    let profileImageName: String // 프로필 이미지 이름
 }
 
 

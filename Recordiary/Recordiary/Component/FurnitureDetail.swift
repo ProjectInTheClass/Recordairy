@@ -19,7 +19,7 @@ struct FurnitureDetailContent: View {
                         .fill(Color(hex: "#E0E0E0"))
                         .frame(width: 100, height: 100)
                         .overlay(
-                            Image(systemName: "photo")
+                            Image( "rug")
                                 .resizable()
                                 .scaledToFit()
                                 .foregroundColor(.gray)
