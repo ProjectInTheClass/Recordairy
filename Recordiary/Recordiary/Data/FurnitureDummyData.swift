@@ -55,7 +55,8 @@ let furnitureDummyData = [
 
 let diaryDummyData: [DiaryEntry] = [
     DiaryEntry(
-        user_id: 1,
+        id : 1,
+        user_id: "1",
         created_at: Calendar.current.date(byAdding: .day, value: -1, to: Date())!,
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!),
         emotion: .happiness,
@@ -66,7 +67,8 @@ let diaryDummyData: [DiaryEntry] = [
         connectedFurniture: nil
     ),
     DiaryEntry(
-        user_id: 2,
+        id : 2,
+        user_id: "2",
         created_at: Calendar.current.date(byAdding: .day, value: -2, to: Date())!,
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -2, to: Date())!),
         emotion: .neutral,
@@ -77,7 +79,8 @@ let diaryDummyData: [DiaryEntry] = [
         connectedFurniture: nil
     ),
     DiaryEntry(
-        user_id: 3,
+        id : 3,
+        user_id: "3",
         created_at: Calendar.current.date(byAdding: .day, value: -3, to: Date())!,
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -3, to: Date())!),
         emotion: .sadness,
@@ -88,7 +91,8 @@ let diaryDummyData: [DiaryEntry] = [
         connectedFurniture: nil
     ),
     DiaryEntry(
-        user_id: 4,
+        id : 4,
+        user_id: "4",
         created_at: Calendar.current.date(byAdding: .day, value: -4, to: Date())!,
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -4, to: Date())!),
         emotion: .anger,
@@ -99,7 +103,8 @@ let diaryDummyData: [DiaryEntry] = [
         connectedFurniture: nil
     ),
     DiaryEntry(
-        user_id: 5,
+        id : 1,
+        user_id: "5",
         created_at: Calendar.current.date(byAdding: .day, value: -5, to: Date())!,
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -5, to: Date())!),
         emotion: .happiness,
@@ -110,7 +115,8 @@ let diaryDummyData: [DiaryEntry] = [
         connectedFurniture: furnitureDummyData[0]
     ),
     DiaryEntry(
-        user_id: 6,
+        id : 1,
+        user_id: "6",
         created_at: Calendar.current.date(byAdding: .day, value: -6, to: Date())!,
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -6, to: Date())!),
         emotion: .neutral,
@@ -121,7 +127,8 @@ let diaryDummyData: [DiaryEntry] = [
         connectedFurniture: furnitureDummyData[1]
     ),
     DiaryEntry(
-        user_id: 7,
+        id : 1,
+        user_id: "7",
         created_at: Calendar.current.date(byAdding: .day, value: -7, to: Date())!,
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -7, to: Date())!),
         emotion: .sadness,
@@ -132,7 +139,8 @@ let diaryDummyData: [DiaryEntry] = [
         connectedFurniture: nil
     ),
     DiaryEntry(
-        user_id: 8,
+        id : 1,
+        user_id: "8",
         created_at: Calendar.current.date(byAdding: .day, value: -8, to: Date())!,
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -8, to: Date())!),
         emotion: .anger,
@@ -143,7 +151,8 @@ let diaryDummyData: [DiaryEntry] = [
         connectedFurniture: furnitureDummyData[2]
     ),
     DiaryEntry(
-        user_id: 9,
+        id : 1,
+        user_id: "9",
         created_at: Calendar.current.date(byAdding: .day, value: -9, to: Date())!,
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -9, to: Date())!),
         emotion: .happiness,
@@ -153,8 +162,8 @@ let diaryDummyData: [DiaryEntry] = [
         is_private: false,
         connectedFurniture: nil
     ),
-    DiaryEntry(
-        user_id: 10,
+    DiaryEntry(id : 1,
+        user_id: "10",
         created_at: Calendar.current.date(byAdding: .day, value: -10, to: Date())!,
         local_date: dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -10, to: Date())!),
         emotion: .neutral,
